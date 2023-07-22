@@ -1,4 +1,4 @@
-import { Model,Schema } from "mongoose";
+import { model,Schema } from "mongoose";
 
 const consignmetSchema = new Schema({
     awb:Number,
@@ -14,7 +14,7 @@ const consignmetSchema = new Schema({
     volume:String,
     charge:Number,
     declaredValue:Number,
-    contentType:Number,
+    contentType:String,
     originPin:Number,
     destinationPin:Number,
     type:String,            // doc / non doc
@@ -48,5 +48,5 @@ const consignmetSchema = new Schema({
     }
 })
 
-const model = new Model('consignment',consignmetSchema)
-export default model
+const Modal = model('consignment',consignmetSchema)
+export default Modal
