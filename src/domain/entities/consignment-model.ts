@@ -48,5 +48,5 @@ const consignmetSchema = new Schema({
     }
 })
 
-const Modal = model('consignment',consignmetSchema)
-export default Modal
+const Model = model('consignment',consignmetSchema)
+export default Model

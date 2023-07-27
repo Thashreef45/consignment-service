@@ -1,8 +1,11 @@
-import { Schema,Model } from "mongoose";
+import { Schema,model } from "mongoose";
 
-const storeSchema = new Schema({
+const awbSchema = new Schema({
     prefix:String,
-    status:String,
+    status:{
+        type:Boolean,
+        default:true
+    },
     type:String,
     awbAvailabilty : {
         type :Number,
@@ -10,4 +13,5 @@ const storeSchema = new Schema({
     }
 })
 
-export default storeSchema
+const awbModel = model('awb',awbSchema)
+export default awbModel
