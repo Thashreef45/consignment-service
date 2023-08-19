@@ -1,13 +1,20 @@
 import repository from "../../infrastructure/repositories/repository"
-import { CreateAwb } from "../../domain/interface/awb"
+import { CreateAwb } from "../interfaces/interface" 
 
-const createAwb = (data:CreateAwb) =>{
-    let obj = {
-        prefix:data.prefix,
-        type:data.type,
+const createAwb = async (data: CreateAwb) => {
+    let awbAlreadyExist = await repository.isExist({prefix:data.prefix})
+    if (!awbAlreadyExist.length) {
+        let obj = {
+            prefix: data.prefix,
+            type: data.type,
+        }
+        let res = await repository.createAwb(obj)
+        return { message: 'success', data }
+    }else {
+        return {message:'Awb prefix is already exist'}
     }
-    
-    repository.createAwb(obj)
+
 }
 
 export default createAwb
+

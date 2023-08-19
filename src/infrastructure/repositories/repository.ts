@@ -1,21 +1,39 @@
 import connectDB from "../../utils/db-connection"
-import awbModel from "../../domain/entities/consignment-store"
+import awbModel from "../../domain/entities/awb"
 import Model from "../../domain/entities/consignment-model"
-import { CreateAwb } from "../../domain/interface/awb"
+import storeOrderModel from "../../domain/entities/store-orders"
+import { buyAwb,CreateAwb } from "../interfaces/interface"
 connectDB()
 
 export default {
     newBooking : async (data:{}) => {
        return await Model.find()
     },
-    buyConsignment : async(key:any, value:number) => {
-        await awbModel.updateOne({prefix:key},{$inc : {awbAvailabilty:value}})
+
+    buyConsignment : async(key:string, value:number) => {
+       return await awbModel.updateOne({prefix:key},{$inc : {awbAvailability:value}})
     },
-    availablityCheck : async(data:any) =>{
-        return await awbModel.find({},{data})
+
+    
+    isExist : async(data:any) =>{
+        return await awbModel.find(data)
     },
-    createAwb : async(data:CreateAwb)=> {
+
+    lastUpdatedAwb: async(data:string) =>{
+        return await awbModel.findOne({prefix:data})
+    },
+
+    //Creating a new Awb Here
+    createAwb : async(data:CreateAwb) => {
         const newData = new awbModel(data)
         newData.save()
+        return data
+    },
+
+
+    //creating a new order in awb store-order
+    awbNewOrder : async(data:buyAwb)=>{
+       const createOrder = new storeOrderModel(data)
+       createOrder.save()
     }
 }

@@ -7,7 +7,7 @@ const awbSchema = new Schema({
         default:true
     },
     type:String,
-    awbAvailabilty : {
+    awbAvailability : {
         type :Number,
         default:10000000
     }

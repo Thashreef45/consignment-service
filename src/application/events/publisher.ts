@@ -21,11 +21,10 @@ export default {
     //sending purchased consignments to cp
     purchasedConsignment: async (data:{}) => {
         try {
-            const queue = 'add-consignments'
+            const queue = 'buy-awb'
             publisher(queue, data)
         } catch (error) {
             console.log(error)
         }
     },
-
 }

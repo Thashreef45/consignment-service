@@ -1,63 +1,32 @@
-import { verify , JwtPayload} from "jsonwebtoken";
 import repository from "../../infrastructure/repositories/repository";
 import publisher from "../events/publisher";
-import { BuyConsignment } from "../../domain/interface/awb";
+import { AwbOrder } from "../interfaces/interface";
 
 
-const purchaseConsignment = async(data:any,token:string) => {
-    try {
-        data = data.data
-        let cpId = verifyToken(token) as JwtPayload
-        let count = Object.keys(data[0]) 
-        let obj:BuyConsignment = {}
-
-        if(count.length == 1){
-            repository.buyConsignment(count[0] , data[count[0]])
-            obj[count[0]] = 1
-
-            let updateData = await repository.availablityCheck(obj)
-            publisher.purchasedConsignment({
-                consignment : updateData,
-                count :  [data[count[0]]],
-                cpId : cpId.id,
-            })
+//function to get last updated awb and publish the data to cp-service
+const purchaseAwb = async (data: AwbOrder) => {
+    let updated = await repository.buyConsignment(data.awbPrefix, data.quantity)
+    let lastUpdatedAwb = await repository.lastUpdatedAwb(data.awbPrefix)
+    if (updated) {
+        if (lastUpdatedAwb) {
+            data.awbAvailability = lastUpdatedAwb.awbAvailability
         }
-        else if(count.length == 2){
-            repository.buyConsignment(count[0],data[0][count[0]])
-            repository.buyConsignment(count[1],data[0][count[1]])
-  
-            obj[count[0]] = 1
-            obj[count[1]] = 1
-            
-            let updateData = await repository.availablityCheck(obj)
-            publisher.purchasedConsignment({
-                consignment : updateData,
-                count :  [data[count[0]],data[count[1]]],
-                cpId : cpId.id,
-            })
-        }
-        else{
-            repository.buyConsignment(count[0],data[0][count[0]])
-            repository.buyConsignment(count[1],data[0][count[1]])
-            repository.buyConsignment(count[2],data[0][count[2]])
-            obj[count[0]] = 1
-            obj[count[1]] = 1
-            obj[count[2]] = 1
-            let updateData = await repository.availablityCheck(obj)
-            publisher.purchasedConsignment({
-                consignment : updateData,
-                count :  [data[count[0]],data[count[1]], data[count[2]]],
-                cpId : cpId.id,
-            })
-        }
-    } catch (error) {
-        console.log(error);
-        
+        updateAwbStore(data)
+        publisher.purchasedConsignment(data)
+        return {message:'success',status:200}
     }
 }
 
-const verifyToken=(key:string) => {
-    return verify(key,String(process.env.JWT_SIGNATURE))
+//function to update awb-store
+const updateAwbStore = (data:AwbOrder) =>{
+    const updateData = {
+        cpId : data.id,
+        prefix : data.awbPrefix,
+        awbFrom : data.awbAvailability + 1,
+        awbTo : data.quantity +  data.awbAvailability + 1,
+    }
+    repository.awbNewOrder(updateData)
 }
 
-export default purchaseConsignment
+
+export default purchaseAwb

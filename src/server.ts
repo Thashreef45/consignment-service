@@ -1,4 +1,4 @@
 import nodeApp from "../app"
 
-new nodeApp().listen()
+new nodeApp().listen(String(process.env.PORT))
 
