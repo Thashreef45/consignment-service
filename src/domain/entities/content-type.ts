@@ -1,4 +1,4 @@
-import { Schema, Model } from "mongoose";
+import { Schema, model } from "mongoose";
 
 
 const contentType = new Schema({
@@ -6,5 +6,5 @@ const contentType = new Schema({
 })
 
 
-const contentModel = new Model('content-model',contentType)
+const contentModel = model('content-type',contentType)
 export default contentModel

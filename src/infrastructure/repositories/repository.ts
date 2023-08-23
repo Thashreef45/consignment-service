@@ -3,16 +3,19 @@ import awbModel from "../../domain/entities/awb"
 import Model from "../../domain/entities/consignment-model"
 import storeOrderModel from "../../domain/entities/store-orders"
 import { buyAwb,CreateAwb } from "../interfaces/interface"
+import contentModel from "../../domain/entities/content-type"
 connectDB()
 
 export default {
     newBooking : async (data:{}) => {
-       return await Model.find()
+    //    return await Model.find()
     },
 
     buyConsignment : async(key:string, value:number) => {
        return await awbModel.updateOne({prefix:key},{$inc : {awbAvailability:value}})
     },
+
+
 
     
     isExist : async(data:any) =>{
@@ -29,6 +32,13 @@ export default {
         newData.save()
         return data
     },
+
+    //creating a new type for consignment
+    createNewConsignmentType : async(typeName:string) => {
+        const newData = new contentModel({typeName:typeName})
+        return newData.save()
+    },
+
 
 
     //creating a new order in awb store-order

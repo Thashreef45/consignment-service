@@ -5,6 +5,7 @@
 
 // route.post('/create-consignment',controller.bookConsignment)
 // route.post('/buy-consignment',controller.PurchaseAwb)
+// route.post('/create-type',controller.createConsignmentType)
 // route.post('/create-awb',controller.CreateAwb)
 
 // export default route

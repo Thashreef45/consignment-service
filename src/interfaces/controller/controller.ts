@@ -1,7 +1,8 @@
 import { Request,Response } from "express"
-import newConsignment from "../../application/usecase/consignment-booking"
 import purchaseAwb from "../../application/usecase/buy-consignment"
+import newConsignment from "../../application/usecase/consignment-booking"
 import createAwb from "../../application/usecase/new-awb"
+import createContent from "../../application/usecase/createContentType"
 
 export default {
     // bookConsignment : async(req:Request,res:Response) => {
@@ -33,4 +34,8 @@ export default {
     // }
 
 
+    // createConsignmentType : async(req:Request,res:Response)=>{
+    //     const data:string = req.body.typeName
+    //     const response = await createContent(data)
+    // }
 }

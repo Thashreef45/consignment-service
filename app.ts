@@ -7,7 +7,6 @@ import cors from 'cors';
 import env from 'dotenv';
 import grpcServer from './src/interfaces/grpc-config/grpc-server';
 
-
 class nodeApp {
   public app: Application
 
