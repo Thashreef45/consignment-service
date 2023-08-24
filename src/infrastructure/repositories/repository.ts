@@ -4,6 +4,7 @@ import Model from "../../domain/entities/consignment-model"
 import storeOrderModel from "../../domain/entities/store-orders"
 import { buyAwb,CreateAwb } from "../interfaces/interface"
 import contentModel from "../../domain/entities/content-type"
+import statusModel from "../../domain/entities/delivery-status"
 connectDB()
 
 export default {
@@ -39,7 +40,11 @@ export default {
         return newData.save()
     },
 
-
+    //creating a delevery status 
+    createNewDeleveryStatus : async(status:string)=>{
+        const newStatus = new statusModel({statusName:status})
+        return newStatus.save()
+    },
 
     //creating a new order in awb store-order
     awbNewOrder : async(data:buyAwb)=>{

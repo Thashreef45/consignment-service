@@ -3,6 +3,7 @@ import purchaseAwb from "../../application/usecase/buy-consignment"
 import newConsignment from "../../application/usecase/consignment-booking"
 import createAwb from "../../application/usecase/new-awb"
 import createContent from "../../application/usecase/createContentType"
+import createDeleveryStatus from "../../application/usecase/create-delevery-status"
 
 export default {
     // bookConsignment : async(req:Request,res:Response) => {
@@ -34,8 +35,17 @@ export default {
     // }
 
 
+
     // createConsignmentType : async(req:Request,res:Response)=>{
     //     const data:string = req.body.typeName
     //     const response = await createContent(data)
+    // },
+
+
+    // createStatus:async(req:Request,res:Response)=>{
+    //     const status = req.body.status
+    //     return await createDeleveryStatus(status)
     // }
+
+
 }
