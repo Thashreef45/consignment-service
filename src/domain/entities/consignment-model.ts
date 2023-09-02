@@ -2,22 +2,26 @@ import { model,Schema } from "mongoose";
 
 const consignmetSchema = new Schema({
     awb:Number,
+    awbPrefix:String,
     image:String,
     drs:String,
-    bookingTime:Date,
+    bookingTime:{
+        type : Date,
+        default : Date.now()
+    },
     mobile:Number,
     address :{
         address:String,
         pincode:Number,
     },
-    weight:String,
-    volume:String,
+    weight:Number,
+    // volume:String,
     charge:Number,
     declaredValue:Number,
     contentType:String,
     originPin:Number,
     destinationPin:Number,
-    type:String,            // doc / non doc
+    isDoc:Boolean,
     sending :{
         nodalRecieved :Date,
         nodalSend:Date,

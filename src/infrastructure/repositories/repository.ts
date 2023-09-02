@@ -8,8 +8,22 @@ import statusModel from "../../domain/entities/delivery-status"
 connectDB()
 
 export default {
-    newBooking : async (data:{}) => {
-    //    return await Model.find()
+    newBooking : async (data:any) => {
+        let cretedData =new Model({
+            awb:data.awb,
+            awbPrefix: data.awbPrefix,
+            cpId:data.cpId,
+            address : {
+                address : data.address,
+                pincode : data.pincode
+            },
+            originPin:data.originPin,
+            isDoc : data.isDoc,
+            contentType : data.contentType,
+            mobile : data.mobile,
+            declaredValue: data.declaredValue
+        })
+        return await cretedData.save()
     },
 
     buyConsignment : async(key:string, value:number) => {

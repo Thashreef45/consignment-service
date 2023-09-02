@@ -23,6 +23,15 @@ export default {
         }
     },
 
+    newBooking : async(call:any ,callback:any) => {
+        try {
+            const reponse = await newConsignment(call.request)
+            callback(null,reponse)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     // CreateAwb : async(req:Request , res:Response) => {
     //     try {
     //        let response =await createAwb(req.body)

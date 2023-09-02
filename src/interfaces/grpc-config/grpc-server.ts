@@ -21,7 +21,8 @@ const grpcServer = () => {
 }
 
 server.addService(consignmentPackage.consignmentService.service,{
-    "buyAwb":controller.PurchaseAwb
+    "buyAwb":controller.PurchaseAwb,
+    "newBooking":controller.newBooking
 })
 
 export default grpcServer

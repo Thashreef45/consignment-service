@@ -19,7 +19,7 @@ const publisher = async (queue:string, data:{}) => {
 
 export default {
     //sending purchased consignments to cp
-    purchasedConsignment: async (data:{}) => {
+    purchasedConsignment: async (data:any) => {
         try {
             const queue = 'buy-awb'
             publisher(queue, data)
@@ -27,4 +27,15 @@ export default {
             console.log(error)
         }
     },
+
+    
+    //removing available consignment number from channel partner after booking
+    removeBookedAwb : async (data:any) => {
+        try {
+            const queue = 'remove-awb'
+            publisher(queue,data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 }
