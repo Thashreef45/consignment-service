@@ -7,16 +7,27 @@
 //     awbPrefix: string,
 //     id: string,
 // }
-export interface CreateAwb {
+interface CreateAwb {
     prefix: string,
     type: string,
 }
 
-export interface AwbOrder {
+interface BuyAwb {
+    quantity: number,
+    awbPrefix: string,
+    id: string,
+}
+
+interface AwbOrder {
     quantity: number,
     awbPrefix: string,
     id: string,
     awbAvailability: number
+}
+
+export {
+    AwbOrder,CreateAwb,
+    BuyAwb,
 }
 
 

@@ -1,5 +1,6 @@
+import { verify } from "jsonwebtoken"
 import repository from "../../infrastructure/repositories/repository"
-import publisher from "../events/publisher"
+import publisher from "../events/publisher/publisher"
 
 const newConsignment = async (data: any) => {
     try {
@@ -7,11 +8,12 @@ const newConsignment = async (data: any) => {
         data.awbPrefix = data.awb.slice(0, 2)
         data.awb = Number(data.awb.slice(2, 10))
         data.mobile = Number(data.mobile)
+        data.id = tokenExtract(data.token)
         const updated = await repository.newBooking(data)
 
         if (updated) {
             publisher.removeBookedAwb({
-                cpId:data.cpId,
+                cpId:data.id,
                 awbPrefix:data.awbPrefix,
                 awb:data.awb
             })
@@ -29,3 +31,13 @@ const newConsignment = async (data: any) => {
 }
 
 export default newConsignment
+
+
+const tokenExtract = (token:string) => {
+    const jwtSignature = String(process.env.JWT_SIGNATURE)
+    token = token.split(" ")[1]
+    const data = verify(token,jwtSignature)
+    if(typeof data == 'object'){
+        return data.id
+    }
+}

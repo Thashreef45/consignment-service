@@ -6,6 +6,7 @@ import logger from 'morgan';
 import cors from 'cors';
 import env from 'dotenv';
 import grpcServer from './src/interfaces/grpc-config/grpc-server';
+import fdmReachedNodalAfterBooking from './src/application/events/consumer/cp-nodal-status-update';
 
 class nodeApp {
   public app: Application
@@ -16,6 +17,7 @@ class nodeApp {
     env.config()
     this.initialiseMiddleware()
     this.initiliseGatewayListner()
+    this.messageConsumers()
   }
 
   private initialiseMiddleware(): void {
@@ -30,6 +32,10 @@ class nodeApp {
 
   private initiliseGatewayListner() :void {
     grpcServer()
+  }
+
+  private messageConsumers () {
+    fdmReachedNodalAfterBooking()
   }
   
   public listen(port: string): void {

@@ -1,10 +1,23 @@
+import { verify } from "jsonwebtoken";
 import repository from "../../infrastructure/repositories/repository";
-import publisher from "../events/publisher";
+import publisher from "../events/publisher/publisher";
 import { AwbOrder } from "../interfaces/interface";
+import { config } from "dotenv";
+config()
 
 
 //function to get last updated awb and publish the data to cp-service
 const purchaseAwb = async (data: AwbOrder) => {
+
+    const jwtSignature = String(process.env.JWT_SIGNATURE)
+    let token  = data.id.split(" ")[1]
+    const verifiedId = verify(token, jwtSignature)
+
+    if(typeof verifiedId == 'object'){
+        data.id = verifiedId.id
+    }
+
+
     let updated = await repository.buyConsignment(data.awbPrefix, data.quantity)
     let lastUpdatedAwb = await repository.lastUpdatedAwb(data.awbPrefix)
     if (updated) {
