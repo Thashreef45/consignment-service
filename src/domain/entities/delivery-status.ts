@@ -1,8 +1,8 @@
-import { Schema,Model } from "mongoose";
+import { Schema,model } from "mongoose";
 
 const statusSchema = new Schema({
     statusName:String,
 })
 
-const statusModel = new Model('status-model',statusSchema)
+const statusModel = model('status-model',statusSchema)
 export default statusModel

@@ -1,18 +1,15 @@
-import { Model,Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 
-const storeOrderModel = new Schema({
+const storeOrderSchema = new Schema({
     purchaseDate: {
         type: Date,
         default: Date.now,
     },
-    cpId:String,
-    orders:[
-        {
-            id:String,
-            awbFrom:Number,
-            awbTo:Number,
-        }
-    ]
+    cpId: String,
+    prefix: String,
+    awbFrom: Number,
+    awbTo: Number,
 })
 
+const storeOrderModel = model('awb-order',storeOrderSchema)
 export default storeOrderModel

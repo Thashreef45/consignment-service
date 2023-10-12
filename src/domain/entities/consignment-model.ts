@@ -1,52 +1,65 @@
-import { Model,Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 
 const consignmetSchema = new Schema({
-    awb:Number,
-    image:String,
-    drs:String,
-    bookingTime:Date,
-    mobile:Number,
-    address :{
-        address:String,
-        pincode:Number,
+    awb: Number,
+    awbPrefix: String,
+    image: String,
+    drs: String,
+    mobile: Number,
+    address: String,
+    originAddress:String,
+    weight: Number,
+    // volume:String,
+    charge: Number,
+    declaredValue: Number,
+    contentType:Schema.Types.ObjectId,
+    status:Schema.Types.ObjectId,
+    originPin: Number,
+    destinationPin: Number,
+    isDoc: Boolean,
+    isReturned: {
+        type: Boolean,
+        default: false
     },
-    weight:String,
-    volume:String,
-    charge:Number,
-    declaredValue:Number,
-    contentType:Number,
-    originPin:Number,
-    destinationPin:Number,
-    type:String,            // doc / non doc
-    sending :{
-        nodalRecieved :Date,
-        nodalSend:Date,
-        apexRecieved:Date,
-        apexSend:Date,
+    isJustBooked: {
+        type: Boolean,
+        default: true
     },
-    recieving:{
-        apexRecieved:Date,
-        apexSend:Date,
-        nodalRecieved :Date,
-        nodalSend:Date,
-        cpRecieved:Date
+    // isNotDelivered:{default:false,type:Boolean},
+    bookingTime: {
+        type: Date,
+        default: Date.now()
     },
-    notDelivered : {
-        sending :{
-            nodalRecieved :Date,
-            nodalSend:Date,
-            apexRecieved:Date,
-            apexSend:Date,
+
+    sending: {
+        nodalRecieved: Date,
+        nodalSend: Date,
+        apexRecieved: Date,
+        apexSend: Date,
+    },
+    recieving: {
+        apexRecieved: Date,
+        apexSend: Date,
+        nodalRecieved: Date,
+        nodalSend: Date,
+        cpRecieved: Date
+    },
+    notDelivered: {
+        sending: {
+            nodalRecieved: Date,
+            nodalSend: Date,
+            apexRecieved: Date,
+            apexSend: Date,
         },
-        recieving:{
-            apexRecieved:Date,
-            apexSend:Date,
-            nodalRecieved :Date,
-            nodalSend:Date,
-            cpRecieved:Date
+        recieving: {
+            apexRecieved: Date,
+            apexSend: Date,
+            nodalRecieved: Date,
+            nodalSend: Date,
+            cpRecieved: Date
         }
     }
 })
 
-const model = new Model('consignment',consignmetSchema)
-export default model
+const Model = model('consignment', consignmetSchema)
+export default Model
