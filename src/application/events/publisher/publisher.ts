@@ -48,5 +48,27 @@ export default {
         } catch (error) {
             console.error(error)
         }
-    }
+    },
+
+
+    //While transfering fdm from nodal sending queue , it should be removed from the queue
+    removeFdmFromNodal : async(data:any) => {
+        try {
+            const queue = 'remove-sending-fdm'
+            publisher(queue, data)
+        } catch (error) {
+            console.error(error)
+        }
+    },
+
+    //Trasfering fdm to cp receiving queue
+    trasferFdmToCP : async(data:any) => {
+        try {
+            const queue = 'transfer-fdm-cp-receiving'
+            publisher(queue, data)
+        } catch (error) {
+            console.error(error)
+        }
+    },
+    
 }

@@ -1,4 +1,4 @@
-import { Request, Response } from "express"
+import { Request, Response, response } from "express"
 import purchaseAwb from "../../application/usecase/buy-consignment"
 import newConsignment from "../../application/usecase/consignment-booking"
 import createAwb from "../../application/usecase/new-awb"
@@ -9,6 +9,10 @@ import ConsignmentTypes from "../../application/usecase/get-consignment-types"
 import todaysBooking from "../../application/usecase/cp-today-bookings"
 import deleteBooking from "../../application/usecase/delete-booking"
 import getBookingHistory from "../../application/usecase/get-booking-history"
+import { GrpcObject } from "@grpc/grpc-js"
+import trackConsignment from "../../application/usecase/track-consignment"
+import getNodalSendFdms from "../../application/usecase/nodal-send-fdms"
+import transferNodalSendingFdm from "../../application/usecase/transfer-nodal-sending-fdm"
 
 export default {
     // bookConsignment : async(req:Request,res:Response) => {
@@ -68,11 +72,43 @@ export default {
 
     getBookingHistory : async(call:any,callback:GrpcCallBack) => {
         try {
-            getBookingHistory(call.request)
+            const response = await getBookingHistory(call.request)
+            callback(null,response)
         } catch (error) {
             
         }
     },
+
+    consignmentTracking : async(call:any,callback:GrpcCallBack) => {
+        try {
+            const response = await trackConsignment(call.request.awb)
+            callback(null,response)
+
+        } catch (error) {
+            
+        }
+    },
+
+    getNodalSendFdms : async (call:any,callback:GrpcCallBack) => {
+        try {
+            const response = await getNodalSendFdms(call.request.token)
+            callback(null,response)
+        } catch (error) {
+            
+        }
+    },
+
+
+    transferNodalSendingFdm: async(call:any,callback:GrpcCallBack)=> {
+        try {
+            const reponse = await transferNodalSendingFdm(call.request)
+            callback(null,{status:200})
+        } catch (error) {
+            
+        }
+    }
+
+
 
 
     // CreateAwb : async(req:Request , res:Response) => {

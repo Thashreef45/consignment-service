@@ -12,18 +12,23 @@ export default {
         let cretedData = new Model({
             awb: data.awb,
             awbPrefix: data.awbPrefix,
+            image: data.image,
             cpId: data.id,
             originPin: data.originPin,
             address: data.address,
             destinationPin: data.pincode,
             isDoc: data.isDoc,
-            originAddress :data.originAddress,
+            originAddress: data.originAddress,
             contentType: data.contentType,
             mobile: data.mobile,
-            declaredValue: data.declaredValue
+            declaredValue: data.declaredValue,
+            isSameNodal: data.isSameNodal,
+            isSameApex: data.isSameNodal,
+            status: '65242b1ae176246b91a399c3'
         })
         return await cretedData.save()
     },
+
 
     buyConsignment: async (key: string, value: number) => {
         return await awbModel.updateOne({ prefix: key }, { $inc: { awbAvailability: value } })
@@ -110,7 +115,7 @@ export default {
             {
                 $match: {
                     originPin: data.pincode,
-                    bookingTime: { $gte: data.from, $lte: data.to },
+                    bookingTime: { $gte: data.from, $lt: data.to },
                     isJustBooked: false
                 }
             },
@@ -121,24 +126,117 @@ export default {
                 $unwind: '$type'
             },
             {
-                $project: { 'type._id': 0 }
+                $set: { type: '$type.typeName' }
             },
             {
-                $set: { type: '$type.typeName' }
+                $lookup: { from: "status-models", localField: 'status', foreignField: '_id', as: 'status' }
+            },
+            {
+                $unwind: '$status'
+            },
+            {
+                $set: { status: "$status.statusName" }
             }
         ])
     },
 
-    BookingsReachedAtNodal: async (prefix: string, awb: number) => {
+    BookingsReachedAtNodal: async (id: string, prefix: string, awb: number, address: string, name: string) => {
         const data = await Model.updateOne(
             { awbPrefix: prefix, awb: awb },
             {
-                $set: { 
-                    isJustBooked: false ,
-                    "sending.nodalRecieved":Date.now(),
-                    status:'65154b2c674c55fd5fd6b491'
+                $set: {
+                    isJustBooked: false,
+                    "sending.nodalRecieved.address": address,
+                    "sending.nodalRecieved.name": name,
+                    "sending.nodalRecieved.Date": Date.now(),
+                    "sending.nodalRecieved.id": id,
+                    status: '65154b2c674c55fd5fd6b491'
                 },
             })
+    },
+
+    //check its a valid prefix 
+    isValidPrefix: async (prefix: string) => {
+        return await awbModel.findOne({ prefix: prefix })
+    },
+
+    Track: async (prefix: string, awb: string) => {
+        return await Model.aggregate([
+            {
+                $match: { awbPrefix: prefix, awb: Number(awb) }
+            },
+            {
+                $lookup: { from: 'content-types', localField: 'contentType', foreignField: '_id', as: 'type' }
+            },
+            {
+                $unwind: '$type'
+            },
+            {
+                $set: { contentType: '$type.typeName' }
+            },
+            {
+                $lookup: { from: "status-models", localField: 'status', foreignField: '_id', as: 'status' }
+            },
+            {
+                $unwind: '$status'
+            },
+            {
+                $set: { status: "$status.statusName" }
+            },
+        ])
+    },
+
+
+    getNodalSendFdms: async (id: string) => {
+        return await Model.aggregate([
+            {
+                $match: {
+                    "sending.nodalRecieved.id": id,
+                    "sending.nodalSend": { $exists: false }
+                },
+            },
+            {
+                $lookup: { from: 'content-types', localField: 'contentType', foreignField: '_id', as: 'type' }
+            },
+            {
+                $unwind: '$type'
+            },
+            {
+                $set: { type: '$type.typeName' }
+            },
+            {
+                $lookup: { from: "status-models", localField: 'status', foreignField: '_id', as: 'status' }
+            },
+            {
+                $unwind: '$status'
+            },
+            {
+                $set: { status: "$status.statusName" }
+            },
+
+        ])
+    },
+
+    getByObjectId: async (id: string) => {
+        return await Model.findOne({ _id: id })
+    },
+
+
+    NodaltoCpSendPart: async (id: string, address: string, cpId: string, name: string) => {
+        return await Model.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    'sending.nodalSend':Date.now(),
+                    'recieving.cpRecieved.Date':Date.now(),
+                    'recieving.cpRecieved.id':cpId,
+                    'recieving.cpRecieved.name':name,
+                    'recieving.cpRecieved.address':address,
+                }
+            }
+        )
     }
 
 }
+
+

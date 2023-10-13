@@ -12,6 +12,9 @@ service consignmentService {
     rpc getTodaysBookings (getTodaysBookingsReq) returns (getTodaysBookingsRes);
     rpc deleteBooking (deleteBookingReq) returns (deleteBookingRes);
     rpc getBookingHistory(getBookingHistoryReq) returns (getBookingHistoryRes);
+    rpc tracking (trackingReq) returns (trackingRes);
+    rpc getNodalSendingFdms (getNodalSendingFdmsReq) returns (getNodalSendingFdmsRes);
+    rpc transferNodalSendingFdm (transferNodalSendingFdmReq) returns (transferNodalSendingFdmRes);
 }
 
 message buyAwbReq {
@@ -37,6 +40,8 @@ message newBookingReq {
     double declaredValue = 9;
     string token = 10;
     string originAddress = 11;
+    bool isSameNodal = 12;
+    bool isSameApex = 13;
 }
 
 message newBookingRes {
@@ -69,6 +74,7 @@ message getTodaysBookingsRes {
     int32 status = 2;
     string message = 3;
 }
+
 message RecentBookings {
     int32 awb = 1;
     string awbPrefix = 2;
@@ -109,3 +115,85 @@ message BookingHistoryData {
     string bookingTime = 5;
     string status = 6;
 }
+
+
+message trackingReq {
+    string awb = 1;
+}
+
+message trackingRes {
+    int32 status = 1; 
+    trackingResData data = 2;
+    string message = 3;
+}
+
+message trackingResData {
+    string image = 1;
+    string awbPrefix = 2;
+    int32 awb = 3;
+    string originAddress = 4;
+    string address = 5;
+    int32 originPin = 6;
+    int32 destinationPin = 7;
+    string contentType = 8;
+    int32 declaredValue = 9;
+    string bookingTime = 10;
+    int32 mobile = 11;
+    trackSendingPart sending = 12;
+    trackReceivingPart receiving = 13;
+    string status = 14;
+}
+
+message trackSendingPart {
+    typeOffice nodalRecieved = 1;
+    string nodalSend = 2;
+    typeOffice apexReceived = 3;
+    string apexSend = 4;
+}
+
+message trackReceivingPart {
+    typeOffice apexReceived = 1;
+    string apexSend = 2;
+    typeOffice nodalReceived = 3;
+    string nodalSend = 4;
+}
+
+message typeOffice {
+    string Date = 1;
+    string address = 2;
+    string name = 3;
+}
+
+message getNodalSendingFdmsReq {
+    string token = 1;
+}
+
+message getNodalSendingFdmsRes {
+    string message = 1;
+    int32 status = 2;
+    repeated getNodalSendingFdmsResData data = 3;
+}
+
+message getNodalSendingFdmsResData {
+    int32 awb = 1;
+    string awbPrefix = 2;
+    int32 destinationPin = 3;
+    string type = 4;
+    string bookingTime = 5;
+    string _id = 6;
+    int32 originPin = 7;
+    string status = 8;
+}
+
+
+message transferNodalSendingFdmReq {
+    string token = 1;
+    string id = 2;
+}
+
+message transferNodalSendingFdmRes {
+    int32 status = 1;
+    string message = 2; 
+}
+
+

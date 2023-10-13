@@ -25,19 +25,18 @@ const fdmReachedNodalAfterBooking = async () => {
 
 const execute = async (data: any) => {
     data = JSON.parse(data)
-    console.log(data)
-
-    for (let i = 0; i < data.length; i++) {
-        const prefix = data[i].slice(0, 2)
-        const awb = Number(data[i].slice(2, data[i].length))
-        UpdateConsignments(prefix, awb)
+    const fdm = data.data
+    for (let i = 0; i < fdm.length; i++) {
+        const prefix = fdm[i].slice(0, 2)
+        const awb = Number(fdm[i].slice(2, fdm[i].length))
+        UpdateConsignments(data.id,prefix, awb,data.address,data.name)
     }
 
 }
 
 
-const UpdateConsignments = async (prefix: string, awb: number) => {
-    await repository.BookingsReachedAtNodal(prefix, awb)
+const UpdateConsignments = async (id:string,prefix: string, awb: number,address:string,name:string) => {
+    await repository.BookingsReachedAtNodal(id,prefix, awb,address,name)
 }
 
 
