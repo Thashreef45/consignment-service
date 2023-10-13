@@ -27,6 +27,9 @@ server.addService(consignmentPackage.consignmentService.service,{
     "getTodaysBookings":controller.getTodaysBookings,
     "deleteBooking":controller.deleteBooking,
     "getBookingHistory":controller.getBookingHistory,
+    "tracking":controller.consignmentTracking,
+    "getNodalSendingFdms":controller.getNodalSendFdms,
+    "transferNodalSendingFdm":controller.transferNodalSendingFdm,
 })
 
 export default grpcServer

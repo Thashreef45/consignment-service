@@ -17,6 +17,18 @@ const consignmetSchema = new Schema({
     originPin: Number,
     destinationPin: Number,
     isDoc: Boolean,
+
+    // Destiation
+    isSameNodal : {
+        type:Boolean,
+        default : false
+    },
+    isSameApex : {
+        type: Boolean,
+        default:false,
+    },
+    
+
     isReturned: {
         type: Boolean,
         default: false
@@ -25,24 +37,24 @@ const consignmetSchema = new Schema({
         type: Boolean,
         default: true
     },
-    // isNotDelivered:{default:false,type:Boolean},
     bookingTime: {
         type: Date,
         default: Date.now()
     },
 
     sending: {
-        nodalRecieved: Date,
+        nodalRecieved: {name:String , address:String,Date:Date,id:String,},
         nodalSend: Date,
-        apexRecieved: Date,
+        apexRecieved: {name:String , address:String,Date:Date,id:String,},
         apexSend: Date,
     },
     recieving: {
-        apexRecieved: Date,
+        apexRecieved: {name:String , address:String,Date:Date,id:String,},
         apexSend: Date,
-        nodalRecieved: Date,
+        nodalRecieved:{name:String , address:String,Date:Date,id:String,},
         nodalSend: Date,
-        cpRecieved: Date
+        cpRecieved: {name:String , address:String,Date:Date,id:String,},
+        cpUpdate : Date
     },
     notDelivered: {
         sending: {
@@ -56,7 +68,11 @@ const consignmetSchema = new Schema({
             apexSend: Date,
             nodalRecieved: Date,
             nodalSend: Date,
-            cpRecieved: Date
+            cpRecieved: Date,
+            deliveryStatus:{
+                status:Boolean,
+                Date:Date,
+            }
         }
     }
 })
