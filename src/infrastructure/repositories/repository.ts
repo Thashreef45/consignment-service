@@ -23,7 +23,7 @@ export default {
             mobile: data.mobile,
             declaredValue: data.declaredValue,
             isSameNodal: data.isSameNodal,
-            isSameApex: data.isSameNodal,
+            isSameApex: data.isSameApex,
             status: '65242b1ae176246b91a399c3'
         })
         return await cretedData.save()
@@ -33,9 +33,6 @@ export default {
     buyConsignment: async (key: string, value: number) => {
         return await awbModel.updateOne({ prefix: key }, { $inc: { awbAvailability: value } })
     },
-
-
-
 
     isExist: async (data: any) => {
         return await awbModel.find(data)
@@ -221,21 +218,111 @@ export default {
         return await Model.findOne({ _id: id })
     },
 
+    //get sending part apex reached consignment
+    getByObjectIdAndApexID: async (id: string, apexId: string) => {
+        return await Model.findOne(
+            {
+                _id: id,
+                'sending.apexRecieved.id': apexId,
+                'sending.apexSend': { $exists: false }
+            }
+        )
+    },
 
     NodaltoCpSendPart: async (id: string, address: string, cpId: string, name: string) => {
         return await Model.updateOne(
             { _id: id },
             {
                 $set: {
-                    'sending.nodalSend':Date.now(),
-                    'recieving.cpRecieved.Date':Date.now(),
-                    'recieving.cpRecieved.id':cpId,
-                    'recieving.cpRecieved.name':name,
-                    'recieving.cpRecieved.address':address,
+                    'sending.nodalSend': Date.now(),
+                    'recieving.cpRecieved.Date': Date.now(),
+                    'recieving.cpRecieved.id': cpId,
+                    'recieving.cpRecieved.name': name,
+                    'recieving.cpRecieved.address': address,
+                    status: '652a236562de0abb642c03a8'
                 }
             }
         )
-    }
+    },
+
+    NodalToApexSendPart: async (id: string, address: string, apexId: string, name: string) => {
+        return await Model.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    'sending.nodalSend': Date.now(),
+                    'sending.apexRecieved.Date': Date.now(),
+                    'sending.apexRecieved.id': apexId,
+                    'sending.apexRecieved.name': name,
+                    'sending.apexRecieved.address': address,
+                }
+            }
+        )
+    },
+
+    getCpRecievedFdms: async (id: string) => {
+        return await Model.aggregate([
+            {
+                $match: {
+                    'recieving.cpRecieved.id': id,
+                    'recieving.cpUpdate': { $exists: false },
+                },
+            },
+            {
+                $lookup: { from: 'content-types', localField: 'contentType', foreignField: '_id', as: 'type' }
+            },
+            {
+                $unwind: '$type'
+            },
+            {
+                $set: { type: '$type.typeName' }
+            }
+        ])
+    },
+
+    getApexSendingFdms: async (id: string) => {
+        return await Model.aggregate([
+            {
+                $match: {
+                    'sending.apexRecieved.id': id,
+                    'sending.apexSend': { $exists: false }
+                }
+            },
+            {
+                $lookup: { from: 'content-types', localField: 'contentType', foreignField: '_id', as: 'type' }
+            },
+            {
+                $unwind: '$type'
+            },
+            {
+                $set: { type: '$type.typeName' }
+            },
+            {
+                $lookup: { from: "status-models", localField: 'status', foreignField: '_id', as: 'status' }
+            },
+            {
+                $unwind: '$status'
+            },
+            {
+                $set: { status: "$status.statusName" }
+            },
+        ])
+    },
+
+    updateNodalRecievedFromApex: async (data: { id: string, address: string, name: string }, id: string) => {
+        return await Model.updateOne(
+            { _id: id },
+            {
+                $set:{
+                    'sending.apexSend': Date.now(),
+                    'recieving.nodalRecieved.name':data.name,
+                    'recieving.nodalRecieved.address':data.address,
+                    'recieving.nodalRecieved.Date':Date.now(),
+                    'recieving.nodalRecieved.id':data.id,
+                }
+            }
+        )
+    },
 
 }
 

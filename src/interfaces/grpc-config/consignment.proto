@@ -15,6 +15,9 @@ service consignmentService {
     rpc tracking (trackingReq) returns (trackingRes);
     rpc getNodalSendingFdms (getNodalSendingFdmsReq) returns (getNodalSendingFdmsRes);
     rpc transferNodalSendingFdm (transferNodalSendingFdmReq) returns (transferNodalSendingFdmRes);
+    rpc getCpRecievedFdms (getCpRecievedFdmsReq) returns (getCpRecievedFdmsRes);
+    rpc getApexSendingFdms (getApexSendingFdmsReq) returns (getApexSendingFdmsRes);
+    rpc transferApexSendingFdm (transferApexSendingFdmReq) returns (transferApexSendingFdmRes);
 }
 
 message buyAwbReq {
@@ -117,6 +120,9 @@ message BookingHistoryData {
 }
 
 
+
+
+
 message trackingReq {
     string awb = 1;
 }
@@ -140,22 +146,24 @@ message trackingResData {
     string bookingTime = 10;
     int32 mobile = 11;
     trackSendingPart sending = 12;
-    trackReceivingPart receiving = 13;
+    trackRecievingPart recieving = 13;
     string status = 14;
 }
 
 message trackSendingPart {
     typeOffice nodalRecieved = 1;
     string nodalSend = 2;
-    typeOffice apexReceived = 3;
+    typeOffice apexRecieved = 3;
     string apexSend = 4;
 }
 
-message trackReceivingPart {
-    typeOffice apexReceived = 1;
+message trackRecievingPart {
+    typeOffice apexRecieved = 1;
     string apexSend = 2;
-    typeOffice nodalReceived = 3;
+    typeOffice nodalRecieved = 3;
     string nodalSend = 4;
+    typeOffice cpRecieved = 5;
+    string cpUpdate=6;
 }
 
 message typeOffice {
@@ -163,6 +171,9 @@ message typeOffice {
     string address = 2;
     string name = 3;
 }
+
+
+
 
 message getNodalSendingFdmsReq {
     string token = 1;
@@ -196,4 +207,57 @@ message transferNodalSendingFdmRes {
     string message = 2; 
 }
 
+
+
+message getCpRecievedFdmsReq{
+    string token = 1;
+}
+
+message getCpRecievedFdmsRes {
+    int32 status = 1;
+    string message = 2;
+    repeated getCpRecievedFdmsResDatas data = 3;
+}
+
+
+message getCpRecievedFdmsResDatas{
+    string awbPrefix = 1;
+    int32 awb = 2;
+    string mobile = 3;
+    string address = 4;
+    string type = 5;
+    string _id = 6;
+}
+
+
+message getApexSendingFdmsReq {
+    string token = 1;
+}
+
+message getApexSendingFdmsRes {
+    string message = 1;
+    int32 status = 2;
+    repeated getApexSendingFdmsResData data = 3;
+}
+
+message getApexSendingFdmsResData {
+    int32 awb = 1;
+    string awbPrefix = 2;
+    int32 destinationPin = 3;
+    string type = 4;
+    string bookingTime = 5;
+    string _id = 6;
+    int32 originPin = 7;
+    string status = 8;
+}
+
+message transferApexSendingFdmReq {
+    string token = 1;
+    string id = 2;
+}
+
+message transferApexSendingFdmRes {
+    int32 status = 1;
+    string message = 2;
+}
 

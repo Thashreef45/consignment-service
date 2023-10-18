@@ -13,6 +13,9 @@ import { GrpcObject } from "@grpc/grpc-js"
 import trackConsignment from "../../application/usecase/track-consignment"
 import getNodalSendFdms from "../../application/usecase/nodal-send-fdms"
 import transferNodalSendingFdm from "../../application/usecase/transfer-nodal-sending-fdm"
+import getCpRecievedFdms from "../../application/usecase/get-cp-recieved-fdms"
+import getApexSendingFdms from "../../application/usecase/get-apex-sending-fdms"
+import transferApexSendingFdm from "../../application/usecase/transfer-apex-sendign-fdms"
 
 export default {
     // bookConsignment : async(req:Request,res:Response) => {
@@ -28,7 +31,7 @@ export default {
             let response = await purchaseAwb(call.request)
             callback(null, response)
         } catch (error) {
-            console.log(error)
+            callback(null,{status:500,message:'Internal Server Error'})
         }
     },
 
@@ -37,7 +40,7 @@ export default {
             const reponse = await newConsignment(call.request)
             callback(null, reponse)
         } catch (error) {
-            console.log(error)
+            callback(null,{status:500,message:'Internal Server Error'})
         }
     },
 
@@ -47,7 +50,7 @@ export default {
             const response = await ConsignmentTypes()
             callback(null, response)
         } catch (error) {
-            console.log(error);
+            callback(null,{status:500,message:'Internal Server Error'})
         }
     },
 
@@ -65,7 +68,7 @@ export default {
             const response = await deleteBooking(call.request)
             callback(null,response)
         } catch (error) {
-
+            callback(null,{status:500,message:'Internal Server Error'})
         }
     },
 
@@ -75,7 +78,7 @@ export default {
             const response = await getBookingHistory(call.request)
             callback(null,response)
         } catch (error) {
-            
+            callback(null,{status:500,message:'Internal Server Error'})
         }
     },
 
@@ -85,7 +88,7 @@ export default {
             callback(null,response)
 
         } catch (error) {
-            
+            callback(null,{status:500,message:'Internal Server Error'})
         }
     },
 
@@ -94,7 +97,7 @@ export default {
             const response = await getNodalSendFdms(call.request.token)
             callback(null,response)
         } catch (error) {
-            
+            callback(null,{status:500,message:'Internal Server Error'})
         }
     },
 
@@ -104,9 +107,36 @@ export default {
             const reponse = await transferNodalSendingFdm(call.request)
             callback(null,{status:200})
         } catch (error) {
-            
+            callback(null,{status:500,message:'Internal Server Error'})
         }
-    }
+    },
+
+    getCpRecievedFdms : async(call:any,callback:GrpcCallBack) => {
+        try {
+            const response = await getCpRecievedFdms(call.request.token)
+            callback(null,response)
+        } catch (error) {
+            callback(null,{status:500,message:'Internal Server Error'})
+        }
+    },
+
+    getApexSendingFdm : async(call:any,callback:GrpcCallBack) => {
+        try {
+            const response = await getApexSendingFdms(call.request.token)
+            callback(null,response)
+        } catch (error) {
+            callback(null,{status:500,message:'Internal Server Error'})
+        }
+    },
+
+    sendApexSendingFdm : async(call:any,callback:GrpcCallBack) => {
+        try {
+            const response = await transferApexSendingFdm(call.request)
+            callback(null,response)
+        } catch (error) {
+            callback(null,{status:500,message:'Internal Server Error'})
+        }
+    },
 
 
 

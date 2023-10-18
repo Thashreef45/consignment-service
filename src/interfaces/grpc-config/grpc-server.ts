@@ -30,6 +30,9 @@ server.addService(consignmentPackage.consignmentService.service,{
     "tracking":controller.consignmentTracking,
     "getNodalSendingFdms":controller.getNodalSendFdms,
     "transferNodalSendingFdm":controller.transferNodalSendingFdm,
+    "getCpRecievedFdms":controller.getCpRecievedFdms,
+    "getApexSendingFdms":controller.getApexSendingFdm,
+    "transferApexSendingFdm":controller.sendApexSendingFdm,
 })
 
 export default grpcServer

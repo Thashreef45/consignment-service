@@ -70,5 +70,32 @@ export default {
             console.error(error)
         }
     },
+
+    transferFdmToApex : async(data:any) => {
+        try {
+            const queue = 'trasfer-fdm-nodal-to-apex'
+            publisher(queue,data)
+        } catch (error) {
+            console.error(error)
+        }
+    },
+
+    removeFdmFromApexSending : async(data:any) => {
+        try {
+            const queue = 'remove-fdm-from-apex-sending'
+            publisher(queue,data)
+        } catch (error) {
+            console.error(error)
+        }
+    },
+
+    sendFdmToNodalRecievingQueue : async(data:any) => {
+        try {
+            const queue = `push-fdm-to-nodal-recieved`
+            publisher(queue,data)
+        } catch (error) {
+            console.error(error)
+        }
+    },
     
 }
