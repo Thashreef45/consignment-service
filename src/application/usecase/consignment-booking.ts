@@ -10,7 +10,6 @@ const newConsignment = async (data: any) => {
         data.mobile = Number(data.mobile)
         data.id = tokenExtract(data.token)
         const updated = await repository.newBooking(data)
-
         if (updated) {
             publisher.removeBookedAwb({
                 cpId:data.id,
@@ -21,9 +20,11 @@ const newConsignment = async (data: any) => {
                 message: 'Booking Success',status: 201
             }
         }
-        else return {
-            message: 'Booking Failed',status: 500
+        else {
+            console.log(updated,'500')
+            return {message: 'Booking Failed',status: 500}
         }
+        
 
     } catch (error) {
         console.log(error)
