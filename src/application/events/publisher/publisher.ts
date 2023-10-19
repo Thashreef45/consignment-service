@@ -97,5 +97,14 @@ export default {
             console.error(error)
         }
     },
+
+    removeFdmFromNodalRecievingQueue : async(data:any) => {
+        try {
+            const queue = `remove-fdm-from-nodal-recieved`
+            publisher(queue,data)
+        } catch (error) {
+            console.error(error)
+        }
+    }, 
     
 }

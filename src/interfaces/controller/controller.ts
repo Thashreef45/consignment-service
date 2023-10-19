@@ -16,6 +16,8 @@ import transferNodalSendingFdm from "../../application/usecase/transfer-nodal-se
 import getCpRecievedFdms from "../../application/usecase/get-cp-recieved-fdms"
 import getApexSendingFdms from "../../application/usecase/get-apex-sending-fdms"
 import transferApexSendingFdm from "../../application/usecase/transfer-apex-sendign-fdms"
+import NodalRecievedFdms from "../../application/usecase/get-nodal-recieved-fdms"
+import sendFdmFromNodalSending from "../../application/usecase/transfer-from-nodal-recieved"
 
 export default {
     // bookConsignment : async(req:Request,res:Response) => {
@@ -137,6 +139,25 @@ export default {
             callback(null,{status:500,message:'Internal Server Error'})
         }
     },
+
+    getNodalRecievedFdms : async(call:any,callback:any) => {
+        try {
+            const response = await NodalRecievedFdms(call.request.token)
+            callback(null,response)
+        } catch (error) {
+            callback(null,{status:500,message:'Internal Server Error'})
+        }
+    },
+
+
+    transferFdmfromNodalSending : async(call:any,callback:any) => {
+        try {
+            const response = await sendFdmFromNodalSending(call.request)
+            callback(null,response)
+        } catch (error) {
+            
+        }
+    }
 
 
 

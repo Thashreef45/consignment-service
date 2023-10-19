@@ -107,7 +107,6 @@ export default {
     },
 
     getBookingHistory: async (data: any) => {
-
         return await Model.aggregate([
             {
                 $match: {
@@ -324,6 +323,49 @@ export default {
         )
     },
 
+    getNodalRecievedFdms : async(id:string) => {
+        return await Model.aggregate([
+            {
+                $match: {
+                    'recieving.nodalRecieved.id': id,
+                    'recieving.nodalSend': { $exists: false }
+                }
+            },
+            {
+                $lookup: { from: 'content-types', localField: 'contentType', foreignField: '_id', as: 'type' }
+            },
+            {
+                $unwind: '$type'
+            },
+            {
+                $set: { type: '$type.typeName' }
+            },
+            {
+                $lookup: { from: "status-models", localField: 'status', foreignField: '_id', as: 'status' }
+            },
+            {
+                $unwind: '$status'
+            },
+            {
+                $set: { status: "$status.statusName" }
+            },
+        ])
+    },
+
+    updateFdmRecievedAtCP : async(cpId:string,address:string,name:string,prefix:string,awb:number,id:string) => {
+        return await Model.updateOne(
+            {_id:id},
+            {
+                $set:{
+                    "recieving.nodalSend":Date.now(),
+                    "recieving.cpRecieved.id":cpId,
+                    "recieving.cpRecieved.name":name,
+                    "recieving.cpRecieved.address":address,
+                    "recieving.cpRecieved.Date":Date.now()
+                }
+            }
+        )
+    },
 }
 
 
