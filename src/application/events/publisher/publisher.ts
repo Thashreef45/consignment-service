@@ -106,5 +106,15 @@ export default {
             console.error(error)
         }
     }, 
+
+
+    assignFdmToApexRecievedQueue : async(data:any) => {
+        try {
+            const queue = `push-fdm-to-apex-recieved`
+            publisher(queue,data)
+        } catch (error) {
+            console.error(error)
+        }
+    },
     
 }

@@ -8,7 +8,6 @@ config()
 const transferNodalSendingFdm = async (data: { id: string, token: string }) => {
     const nodalId = String(decodeToken(data.token))
     const consignmentDetails = await repository.getByObjectId(data.id)
-
     if (consignmentDetails) {
         if (consignmentDetails.isSameNodal) {
             executeSameNodal(consignmentDetails)
@@ -40,20 +39,24 @@ const removeFdmFromNodal = (id: string, data: any) => {
 // same nodal -- transfer to cp
 const executeSameNodal = async (data: any) => {
 
-    let cpData:any = await getCpDetails({ pin: data.destinationPin });
+    let cpData: any = await getCpDetails({ pin: data.destinationPin });
     cpData = JSON.parse(cpData)
 
-    await repository.NodaltoCpSendPart(data._id,cpData.address,cpData.id,cpData.name)
+    await repository.NodaltoCpSendPart(data._id, cpData.address, cpData.id, cpData.name)
 
-    publisher.trasferFdmToCP({id:cpData.id,awb:`${data.awbPrefix}${data.awb}`})
+    publisher.trasferFdmToCP({ id: cpData.id, awb: `${data.awbPrefix}${data.awb}` })
 }
 
 
-const executeApex = async(data:any) => {
-    let apexData:any = await getApexDetails({prefix:data.awbPrefix})
+const executeApex = async (data: any) => {
+    let cpData:any = await getCpDetails({ pin: data.originPin })
+    cpData = JSON.parse(cpData)
+    console.log(cpData)
+    
+    let apexData: any = await getApexDetails({ prefix: cpData.prefix })
     apexData = JSON.parse(apexData)
-    await repository.NodalToApexSendPart(data._id,apexData.address,apexData.id,apexData.name)
-    publisher.transferFdmToApex({id:apexData.id,awb:`${data.awbPrefix}${data.awb}`})
+    await repository.NodalToApexSendPart(data._id, apexData.address, apexData.id, apexData.name)
+    publisher.transferFdmToApex({ id: apexData.id, awb: `${data.awbPrefix}${data.awb}` })
 }
 
 
@@ -63,9 +66,9 @@ const executeApex = async(data:any) => {
 
 //getting cp data to set on the consignment, when fdm transfering to cp from nodal
 const getCpDetails = (data: { pin: number }) => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            const queue = 'cp-details-to-nodal';
+            const queue = 'get-cp-details';
             const Url = String(process.env.RabbitMQ_Link);
             const correlationId = generateUuid();
 
@@ -103,9 +106,9 @@ const getCpDetails = (data: { pin: number }) => {
 
 
 const getApexDetails = (data: { prefix: string }) => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            const queue = 'apex-details-to-nodal'
+            const queue = 'get-apex-details-by-prefix'
             const Url = String(process.env.RabbitMQ_Link);
             const correlationId = generateUuid();
 
