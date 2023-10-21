@@ -366,6 +366,25 @@ export default {
             }
         )
     },
+
+    updateAfterApexToApexTransfer : async(id:string,apexId:string,name:string,address:string) => {
+        return await Model.updateOne(
+            {
+                _id:id,
+                'sending.apexSend':{ $exists: false }
+            },
+            {
+                $set:{
+                    'sending.apexSend':Date.now(),
+                    'recieving.apexRecieved.id':apexId,
+                    'recieving.apexRecieved.name':name,
+                    'recieving.apexRecieved.address':address,
+                    'recieving.apexRecieved.Date':Date.now()
+                }
+            }
+        )
+    },
+    
 }
 
 

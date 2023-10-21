@@ -107,7 +107,7 @@ export default {
     transferNodalSendingFdm: async(call:any,callback:GrpcCallBack)=> {
         try {
             const reponse = await transferNodalSendingFdm(call.request)
-            callback(null,{status:200})
+            callback(null,{status:200,message:'sucess'})
         } catch (error) {
             callback(null,{status:500,message:'Internal Server Error'})
         }
@@ -157,7 +157,7 @@ export default {
         } catch (error) {
             
         }
-    }
+    },
 
 
 
