@@ -20,6 +20,14 @@ service consignmentService {
     rpc transferApexSendingFdm (transferApexSendingFdmReq) returns (transferApexSendingFdmRes);
     rpc getNodalRecievedFdms (getNodalRecievedFdmsReq) returns (getNodalRecievedFdmsRes);
     rpc transferNodalRecievedFdm (transferNodalRecievedFdmReq) returns (transferNodalRecievedFdmRes);
+    rpc getApexRecievedfdms (getApexRecievedfdmsReq) returns (getApexRecievedfdmsRes);
+    rpc transferApexRecievedFdms (transferApexRecievedFdmsReq) returns (transferApexRecievedFdmsRes);
+    rpc assignFdm (assignFdmReq) returns (assignFdmRes);
+    rpc getAssignedFdms (getAssignedFdmsReq) returns (getAssignedFdmsRes);
+    rpc getDeliveryStatus (getDeliveryStatusReq) returns (getDeliveryStatusRes);
+    rpc updateDeliveryStatus (updateDeliveryStatusReq) returns (updateDeliveryStatusRes);
+    rpc getReturnNodalSendingFdms (getNodalRecievedFdmsReq) returns (getNodalRecievedFdmsRes);
+    rpc transferReturnNodalSendingFdms (transferNodalSendingFdmReq) returns (transferNodalSendingFdmRes);
 }
 
 message buyAwbReq {
@@ -124,7 +132,6 @@ message BookingHistoryData {
 
 
 
-
 message trackingReq {
     string awb = 1;
 }
@@ -150,6 +157,9 @@ message trackingResData {
     trackSendingPart sending = 12;
     trackRecievingPart recieving = 13;
     string status = 14;
+    string drs = 15;
+    bool isReturned = 16;
+    trackReturn notDelivered = 17;
 }
 
 message trackSendingPart {
@@ -168,11 +178,17 @@ message trackRecievingPart {
     string cpUpdate=6;
 }
 
+message trackReturn {
+    trackSendingPart sending = 1;
+    trackRecievingPart recieving = 2;
+}
+
 message typeOffice {
     string Date = 1;
     string address = 2;
     string name = 3;
 }
+
 
 
 
@@ -253,6 +269,8 @@ message getApexSendingFdmsResData {
     string status = 8;
 }
 
+
+
 message transferApexSendingFdmReq {
     string token = 1;
     string id = 2;
@@ -301,3 +319,110 @@ message transferNodalRecievedFdmRes {
     int32 status = 1;
     string message = 2;
 }
+
+
+
+
+
+
+message getApexRecievedfdmsReq {
+    string token = 1;
+}
+
+message getApexRecievedfdmsRes {
+    string message = 1;
+    int32 status = 2;
+    repeated getApexRecievedfdmsResData data = 3;
+}
+
+
+message getApexRecievedfdmsResData {
+    int32 awb = 1;
+    string awbPrefix = 2;
+    int32 destinationPin = 3;
+    string type = 4;
+    string bookingTime = 5;
+    string _id = 6;
+    int32 originPin = 7;
+    string status = 8;
+}
+
+
+
+message transferApexRecievedFdmsReq {
+    string token = 1;
+    string id = 2; 
+}
+
+message transferApexRecievedFdmsRes {
+    int32 status = 1;
+    string message = 2;
+}
+
+
+
+
+message assignFdmReq {
+    string token = 1;
+    string id = 2;
+    string empId = 3;
+}
+
+message assignFdmRes {
+    string message = 1;
+    int32 status = 2;
+}
+
+
+
+message getAssignedFdmsReq {
+    string id = 1;
+}
+
+message getAssignedFdmsRes {
+    string message = 1;
+    int32 status = 2;
+    repeated getAssignedFdmsResData data = 3;
+}
+
+message getAssignedFdmsResData {
+    string _id = 1;
+    string awbPrefix = 2;
+    int32 awb = 3;
+    string mobile = 4;
+    string address = 5;
+    string status = 6;
+    string type = 7;
+    bool isReturned = 8;
+}
+
+
+
+message getDeliveryStatusReq {}
+message getDeliveryStatusRes {
+    int32 status = 1;
+    string message = 2;
+    repeated getDeliveryStatusResData data = 3;
+}
+
+message getDeliveryStatusResData {
+    string _id = 1;
+    string statusName = 2;
+}
+
+
+
+
+message updateDeliveryStatusReq {
+    string id = 1;
+    string statusId = 2;
+    string image = 3;
+}
+
+message updateDeliveryStatusRes {
+    int32 status = 1;
+    string message = 2;
+}
+
+
+

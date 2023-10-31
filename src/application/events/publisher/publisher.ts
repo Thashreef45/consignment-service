@@ -64,7 +64,7 @@ export default {
     //Trasfering fdm to cp receiving queue
     trasferFdmToCP : async(data:any) => {
         try {
-            const queue = 'transfer-fdm-cp-receiving'
+            const queue = 'transfer-fdm-cp-recieving'
             publisher(queue, data)
         } catch (error) {
             console.error(error)
@@ -116,5 +116,33 @@ export default {
             console.error(error)
         }
     },
+
+    removeFdmFromApexRecievedQueue : async(data:any) => {
+        try {
+            const queue = `remove-fdm-from-apex-recieved`
+            publisher(queue,data)
+        } catch (error) {
+            console.error(error)
+        }
+    },
+
+    removeFdmFromCpRecievedQueue : async(data:any) => {
+        try {
+            const queue = 'remove-recieved-awb'
+            publisher(queue,data)
+        } catch (error) {
+            console.error(error)
+        }
+    },
+
+    fdmToNodalSending: async(data:any) => {
+        try {
+            const queue = 'push-fdm-to-nodal-sending'
+            publisher(queue,data)
+        } catch (error) {
+            console.error(error)
+        }
+    },
+
     
 }

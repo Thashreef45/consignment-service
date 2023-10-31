@@ -42,37 +42,39 @@ const consignmetSchema = new Schema({
         default: Date.now()
     },
 
+    deliveryAssignedTo : {
+        delivery :Schema.Types.ObjectId,
+        return : Schema.Types.ObjectId
+    },
+    
     sending: {
-        nodalRecieved: {name:String , address:String,Date:Date,id:String,},
+        nodalRecieved: {name:String , address:String,Date:Date,id:String},
         nodalSend: Date,
-        apexRecieved: {name:String , address:String,Date:Date,id:String,},
+        apexRecieved: {name:String , address:String,Date:Date,id:String},
         apexSend: Date,
     },
     recieving: {
-        apexRecieved: {name:String , address:String,Date:Date,id:String,},
+        apexRecieved: {name:String , address:String,Date:Date,id:String},
         apexSend: Date,
-        nodalRecieved:{name:String , address:String,Date:Date,id:String,},
+        nodalRecieved:{name:String , address:String,Date:Date,id:String},
         nodalSend: Date,
-        cpRecieved: {name:String , address:String,Date:Date,id:String,},
+        cpRecieved: {name:String , address:String,Date:Date,id:String},
         cpUpdate : Date
     },
     notDelivered: {
         sending: {
-            nodalRecieved: Date,
+            nodalRecieved: {name:String , address:String,Date:Date,id:String},
             nodalSend: Date,
-            apexRecieved: Date,
+            apexRecieved: {name:String , address:String,Date:Date,id:String},
             apexSend: Date,
         },
         recieving: {
-            apexRecieved: Date,
+            apexRecieved: {name:String , address:String,Date:Date,id:String},
             apexSend: Date,
-            nodalRecieved: Date,
+            nodalRecieved:{name:String , address:String,Date:Date,id:String},
             nodalSend: Date,
-            cpRecieved: Date,
-            deliveryStatus:{
-                status:Boolean,
-                Date:Date,
-            }
+            cpRecieved: {name:String , address:String,Date:Date,id:String},
+            cpUpdate : Date
         }
     }
 })

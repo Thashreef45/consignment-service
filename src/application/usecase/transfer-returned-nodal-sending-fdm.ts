@@ -2,34 +2,54 @@ import * as amqp from 'amqplib'
 import { config } from 'dotenv'
 import repository from "../../infrastructure/repositories/repository"
 import decodeToken from "../../utils/decode-token"
-import publisher from '../events/publisher/publisher'
-config()
 
-const sendFdmFromNodalRecieved = async (data: { token: string, id: string }) => {
-    const NodalId: string = String(decodeToken(data.token))
-    const consignmentData: any = await repository.getByObjectId(data.id)
-    let cpData: any = await getCpData(consignmentData.destinationPin)
-    cpData = JSON.parse(cpData)
-    publisher.trasferFdmToCP({ id: cpData.id, awb: `${consignmentData.awbPrefix}${consignmentData.awb}` })
 
-    publisher.removeFdmFromNodalRecievingQueue({ id: NodalId, awb: `${consignmentData.awbPrefix}${consignmentData.awb}` })
 
-    const response = await repository.updateFdmRecievedAtCP
-        (
-            cpData.id,
-            cpData.address,
-            cpData.name,
-            consignmentData.awbPrefix,
-            consignmentData.awb,
-            data.id
-        )
-    if(response) return {status:200,message:'success'}
-    else return {status:400,message:'Db updation failed'}
+const transferNodalSendingReturnedFdm = async (data:{token:string,id:string}) => {
+
+    const nodalId:string = String(decodeToken(data.token))
+    const consignment = await repository.getByObjectId(data.id)
+    if(consignment){
+        if(!consignment.isReturned){
+            return {status:400,message:'Cannot return this consignment'}
+        }
+        else if(consignment.isSameNodal){
+            executeSameNodal(consignment)
+        }else if(consignment.isSameApex){
+            executeSameApex()
+        }else {
+            executeApex()
+        }
+    }else{
+        return {status:404,message:'Consignment not found'}
+    }
 
 }
 
+export default transferNodalSendingReturnedFdm
 
-const getCpData = (pincode: number) => {
+
+const executeSameNodal = async (data:any) => {
+    let cpData:any = await getCpDetails({ pin: data.originPin })
+    cpData = JSON.parse(cpData)
+    if(!cpData){
+        return {status:404,message:'Failed to find CP details'}
+    }
+    let updated = await repository.transferReturnFromNodalSendingToCpRecieving(data._id,cpData.address,cpData.name,cpData.id)
+    if(updated){
+        return {status:200,message:'success'}
+    }else{
+        return {status:400,message:'Failed to transfer'}
+    }
+}
+
+const executeSameApex = () => {}
+const executeApex = () => {}
+
+
+
+
+const getCpDetails = (data: { pin: number }) => {
     return new Promise(async (resolve, reject) => {
         try {
             const queue = 'get-cp-details'
@@ -55,7 +75,7 @@ const getCpData = (pincode: number) => {
                 }
             }, { noAck: true });
 
-            channel.sendToQueue(queue, Buffer.from(JSON.stringify({ pin: pincode })), {
+            channel.sendToQueue(queue, Buffer.from(JSON.stringify({ pin: data.pin })), {
                 correlationId: correlationId,
                 replyTo: reply.queue,
             });
@@ -63,16 +83,12 @@ const getCpData = (pincode: number) => {
             console.log(error);
             reject(error);
         }
+
     });
+
 }
-
-
 
 
 const generateUuid = () => {
     return Math.random().toString() + Math.random().toString() + Math.random().toString();
 };
-
-
-
-export default sendFdmFromNodalRecieved
