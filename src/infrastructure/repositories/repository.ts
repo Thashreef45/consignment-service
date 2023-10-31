@@ -5,6 +5,7 @@ import storeOrderModel from "../../domain/entities/store-orders"
 import { buyAwb, CreateAwb } from "../interfaces/interface"
 import contentModel from "../../domain/entities/content-type"
 import statusModel from "../../domain/entities/delivery-status"
+import mongoose from "mongoose"
 connectDB()
 
 export default {
@@ -178,7 +179,7 @@ export default {
             },
             {
                 $set: { status: "$status.statusName" }
-            },
+            }
         ])
     },
 
@@ -260,12 +261,21 @@ export default {
     },
 
     getCpRecievedFdms: async (id: string) => {
+        console.log(id)
         return await Model.aggregate([
             {
-                $match: {
-                    'recieving.cpRecieved.id': id,
-                    'recieving.cpUpdate': { $exists: false },
-                },
+                $match: {$or:[
+                    {
+                        'recieving.cpRecieved.id': id,
+                        deliveryAssignedTo: { $exists: false },
+                        'recieving.cpUpdate': { $exists: false },
+                    },
+                    {
+                        'deliveryAssignedTo.return': { $exists: false },
+                        'notDelivered.recieving.cpRecieved.id' : id,
+                        'notDelivered.recieving.cpUpdate' : { $exists: false }
+                    }
+                ]}
             },
             {
                 $lookup: { from: 'content-types', localField: 'contentType', foreignField: '_id', as: 'type' }
@@ -312,18 +322,18 @@ export default {
         return await Model.updateOne(
             { _id: id },
             {
-                $set:{
+                $set: {
                     'sending.apexSend': Date.now(),
-                    'recieving.nodalRecieved.name':data.name,
-                    'recieving.nodalRecieved.address':data.address,
-                    'recieving.nodalRecieved.Date':Date.now(),
-                    'recieving.nodalRecieved.id':data.id,
+                    'recieving.nodalRecieved.name': data.name,
+                    'recieving.nodalRecieved.address': data.address,
+                    'recieving.nodalRecieved.Date': Date.now(),
+                    'recieving.nodalRecieved.id': data.id,
                 }
             }
         )
     },
 
-    getNodalRecievedFdms : async(id:string) => {
+    getNodalRecievedFdms: async (id: string) => {
         return await Model.aggregate([
             {
                 $match: {
@@ -352,39 +362,245 @@ export default {
         ])
     },
 
-    updateFdmRecievedAtCP : async(cpId:string,address:string,name:string,prefix:string,awb:number,id:string) => {
+    updateFdmRecievedAtCP: async (cpId: string, address: string, name: string, prefix: string, awb: number, id: string) => {
         return await Model.updateOne(
-            {_id:id},
+            { _id: id },
             {
-                $set:{
-                    "recieving.nodalSend":Date.now(),
-                    "recieving.cpRecieved.id":cpId,
-                    "recieving.cpRecieved.name":name,
-                    "recieving.cpRecieved.address":address,
-                    "recieving.cpRecieved.Date":Date.now()
+                $set: {
+                    "recieving.nodalSend": Date.now(),
+                    "recieving.cpRecieved.id": cpId,
+                    "recieving.cpRecieved.name": name,
+                    "recieving.cpRecieved.address": address,
+                    "recieving.cpRecieved.Date": Date.now()
                 }
             }
         )
     },
 
-    updateAfterApexToApexTransfer : async(id:string,apexId:string,name:string,address:string) => {
+    updateAfterApexToApexTransfer: async (id: string, apexId: string, name: string, address: string) => {
         return await Model.updateOne(
             {
-                _id:id,
-                'sending.apexSend':{ $exists: false }
+                _id: id,
+                'sending.apexSend': { $exists: false }
             },
             {
-                $set:{
-                    'sending.apexSend':Date.now(),
-                    'recieving.apexRecieved.id':apexId,
-                    'recieving.apexRecieved.name':name,
-                    'recieving.apexRecieved.address':address,
-                    'recieving.apexRecieved.Date':Date.now()
+                $set: {
+                    'sending.apexSend': Date.now(),
+                    'recieving.apexRecieved.id': apexId,
+                    'recieving.apexRecieved.name': name,
+                    'recieving.apexRecieved.address': address,
+                    'recieving.apexRecieved.Date': Date.now()
                 }
             }
         )
     },
-    
+
+    getApexRecievedFdms: async (id: string) => {
+        return await Model.aggregate([
+            {
+                $match: {
+                    'recieving.apexRecieved.id': id,
+                    'recieving.apexSend': { $exists: false }
+                }
+            },
+            {
+                $lookup: { from: 'content-types', localField: 'contentType', foreignField: '_id', as: 'type' }
+            },
+            {
+                $unwind: '$type'
+            },
+            {
+                $set: { type: '$type.typeName' }
+            },
+            {
+                $lookup: { from: "status-models", localField: 'status', foreignField: '_id', as: 'status' }
+            },
+            {
+                $unwind: '$status'
+            },
+            {
+                $set: { status: "$status.statusName" }
+            },
+        ])
+    },
+
+    trasferFdmFromApexRecievedToNodalRecieved: async (id: string, nodalId: string, name: string, address: string) => {
+        return await Model.updateOne(
+            {
+                _id: id,
+                'recieving.apexSend': { $exists: false }
+            },
+            {
+                $set: {
+                    'recieving.apexSend': Date.now(),
+                    'recieving.nodalRecieved.id': nodalId,
+                    'recieving.nodalRecieved.name': name,
+                    'recieving.nodalRecieved.address': address,
+                    'recieving.nodalRecieved.Date': Date.now()
+                }
+            }
+        )
+    },
+
+    assignFdmtoEmployee: async (id: string, empId: string) => {
+        return await Model.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    'deliveryAssignedTo.delivery': empId
+                }
+            }
+        )
+    },
+
+    assignRTOFdmtoEmployee: async (id: string, empId: string) => {
+        return await Model.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    'deliveryAssignedTo.return': empId
+                }
+            }
+        )
+    },
+
+
+
+    getEmployeeAssignedFdms: async (id: mongoose.Types.ObjectId) => {
+        return await Model.aggregate([
+            {
+                $match: {
+                    $or:
+                        [
+                            { 'deliveryAssignedTo.delivery': id ,'recieving.cpUpdate': { $exists: false }},
+                            { 'deliveryAssignedTo.return': id ,'notDelivered.recieving.cpUpdate': { $exists: false }}
+                        ],
+                }
+
+            },
+            {
+                $lookup: { from: 'content-types', localField: 'contentType', foreignField: '_id', as: 'type' }
+            },
+            {
+                $unwind: '$type'
+            },
+            {
+                $set: { type: '$type.typeName' }
+            },
+            {
+                $lookup: { from: "status-models", localField: 'status', foreignField: '_id', as: 'status' }
+            },
+            {
+                $unwind: '$status'
+            },
+            {
+                $set: { status: "$status.statusName" }
+            }
+        ])
+    },
+
+
+    getDeliveryStatus: async () => {
+        return await statusModel.aggregate([
+            {
+                $match: {
+                    statusName: { $nin: ['Booked', 'Intransist', 'Out for delivery'] }
+                }
+            }
+        ])
+    },
+
+    getDeliveryStatusById: async (id: string) => {
+        return await statusModel.findOne({ _id: id })
+    },
+
+
+    updateDelivered : async (id: string, status: string, image: string) => {
+        return await Model.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    'recieving.cpUpdate': Date.now(),
+                    status: status,
+                    drs: image
+                }
+            }
+        )
+    },
+
+    updateRTPDelivery : async (id: string, image: string) => {
+        return await Model.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    'notDelivered.recieving.cpUpdate': Date.now(),
+                    drs: image
+                }
+            }
+        )
+    },
+
+    updateReturnFromCpToNodal : async (id: string, status: string, image: string,address:string,name:string,nodalId:string) => {
+        return await Model.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    'recieving.cpUpdate': Date.now(),
+                    'notDelivered.sending.nodalRecieved.Date': Date.now(),
+                    'notDelivered.sending.nodalRecieved.name': name,
+                    'notDelivered.sending.nodalRecieved.address': address,
+                    'notDelivered.sending.nodalRecieved.id': nodalId,
+                    status: status,
+                    drs: image,
+                    isReturned:true
+                }
+            }
+        )
+    },
+
+
+    getNodalReturnedSendingFdms : async(id:string) => {
+        return await Model.aggregate([
+            {
+                $match:{
+                    'notDelivered.sending.nodalRecieved.id':id,
+                    'notDelivered.sending.nodalSend': { $exists: false }
+                }
+            },
+            {
+                $lookup: { from: 'content-types', localField: 'contentType', foreignField: '_id', as: 'type' }
+            },
+            {
+                $unwind: '$type'
+            },
+            {
+                $set: { type: '$type.typeName' }
+            },
+            {
+                $lookup: { from: "status-models", localField: 'status', foreignField: '_id', as: 'status' }
+            },
+            {
+                $unwind: '$status'
+            },
+            {
+                $set: { status: "$status.statusName" }
+            }
+        ])
+    },
+
+    transferReturnFromNodalSendingToCpRecieving : async (id: string,address:string,name:string,cpId:string) => {
+        return await Model.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    'notDelivered.sending.nodalSend': Date.now(),
+                    'notDelivered.recieving.cpRecieved.Date': Date.now(),
+                    'notDelivered.recieving.cpRecieved.name': name,
+                    'notDelivered.recieving.cpRecieved.address': address,
+                    'notDelivered.recieving.cpRecieved.id': cpId,
+                }
+            }
+        )
+    },
+
 }
-
-

@@ -3,7 +3,7 @@ import repository from "../../infrastructure/repositories/repository"
 
 const getNodalSendFdms = async(token:string) => {
     try {
-        const id = tokenExtract(token)
+        const id:string = String(tokenExtract(token))
         const response = await repository.getNodalSendFdms(id)
         if(response.length){
             return {status:200,data:response}

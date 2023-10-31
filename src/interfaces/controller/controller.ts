@@ -17,7 +17,16 @@ import getCpRecievedFdms from "../../application/usecase/get-cp-recieved-fdms"
 import getApexSendingFdms from "../../application/usecase/get-apex-sending-fdms"
 import transferApexSendingFdm from "../../application/usecase/transfer-apex-sendign-fdms"
 import NodalRecievedFdms from "../../application/usecase/get-nodal-recieved-fdms"
-import sendFdmFromNodalSending from "../../application/usecase/transfer-from-nodal-recieved"
+import sendFdmFromNodalRecieved from "../../application/usecase/transfer-from-nodal-recieved"
+import getApexRecievedFdms from "../../application/usecase/get-apex-recieved-fdms"
+import transferApexRecievedFdms from "../../application/usecase/transfer-apex-recieved-fdm"
+import assignFdmToEmployee from "../../application/usecase/assign-fdm-to-employee"
+import getAssignedFdms from "../../application/usecase/get-assigned-fdms"
+import getDeliveryStatus from "../../application/usecase/get-delivery-status"
+import updateDeliveryStatus from "../../application/usecase/update-delivery-status"
+import getNodalReturnSendingFdms from "../../application/usecase/nodal-return-sending-fdms"
+import transferNodalSendingReturnedFdm from "../../application/usecase/transfer-returned-nodal-sending-fdm"
+
 
 export default {
     // bookConsignment : async(req:Request,res:Response) => {
@@ -33,7 +42,7 @@ export default {
             let response = await purchaseAwb(call.request)
             callback(null, response)
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
@@ -42,7 +51,7 @@ export default {
             const reponse = await newConsignment(call.request)
             callback(null, reponse)
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
@@ -52,7 +61,7 @@ export default {
             const response = await ConsignmentTypes()
             callback(null, response)
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
@@ -68,98 +77,171 @@ export default {
     deleteBooking: async (call: any, callback: GrpcCallBack) => {
         try {
             const response = await deleteBooking(call.request)
-            callback(null,response)
+            callback(null, response)
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
 
-    getBookingHistory : async(call:any,callback:GrpcCallBack) => {
+    getBookingHistory: async (call: any, callback: GrpcCallBack) => {
         try {
             const response = await getBookingHistory(call.request)
-            callback(null,response)
+            callback(null, response)
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
-    consignmentTracking : async(call:any,callback:GrpcCallBack) => {
+    consignmentTracking: async (call: any, callback: GrpcCallBack) => {
         try {
             const response = await trackConsignment(call.request.awb)
-            callback(null,response)
+            callback(null, response)
 
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
-    getNodalSendFdms : async (call:any,callback:GrpcCallBack) => {
+    getNodalSendFdms: async (call: any, callback: GrpcCallBack) => {
         try {
             const response = await getNodalSendFdms(call.request.token)
-            callback(null,response)
+            callback(null, response)
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
 
-    transferNodalSendingFdm: async(call:any,callback:GrpcCallBack)=> {
+    transferNodalSendingFdm: async (call: any, callback: GrpcCallBack) => {
         try {
             const reponse = await transferNodalSendingFdm(call.request)
-            callback(null,{status:200,message:'sucess'})
+            callback(null, { status: 200, message: 'sucess' })
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
-    getCpRecievedFdms : async(call:any,callback:GrpcCallBack) => {
+    getCpRecievedFdms: async (call: any, callback: GrpcCallBack) => {
         try {
             const response = await getCpRecievedFdms(call.request.token)
-            callback(null,response)
+            callback(null, response)
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
-    getApexSendingFdm : async(call:any,callback:GrpcCallBack) => {
+    getApexSendingFdm: async (call: any, callback: GrpcCallBack) => {
         try {
             const response = await getApexSendingFdms(call.request.token)
-            callback(null,response)
+            callback(null, response)
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
-    sendApexSendingFdm : async(call:any,callback:GrpcCallBack) => {
+    sendApexSendingFdm: async (call: any, callback: GrpcCallBack) => {
         try {
             const response = await transferApexSendingFdm(call.request)
-            callback(null,response)
+            callback(null, response)
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
-    getNodalRecievedFdms : async(call:any,callback:any) => {
+    getNodalRecievedFdms: async (call: any, callback: GrpcCallBack) => {
         try {
             const response = await NodalRecievedFdms(call.request.token)
-            callback(null,response)
+            callback(null, response)
         } catch (error) {
-            callback(null,{status:500,message:'Internal Server Error'})
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
 
-    transferFdmfromNodalSending : async(call:any,callback:any) => {
+    transferFdmfromNodalRecieved: async (call: any, callback: GrpcCallBack) => {
         try {
-            const response = await sendFdmFromNodalSending(call.request)
-            callback(null,response)
+            const response = await sendFdmFromNodalRecieved(call.request)
+            callback(null, response)
         } catch (error) {
-            
+            callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
 
 
+    getApexRecievedFdms: async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await getApexRecievedFdms(call.request.token)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
+
+
+    transferFdmFromApexRecieved : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await transferApexRecievedFdms(call.request)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
+
+
+    assignFdmtoEmployee : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await assignFdmToEmployee(call.request)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    }, 
+
+    getEmployeeAssignedConsignments : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await getAssignedFdms(call.request.id)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    }, 
+
+    getDeliveryStatus : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await getDeliveryStatus()
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
+
+    updateDeliveryStatus : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await updateDeliveryStatus(call.request)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
+
+    getNodalSendingReturnFdms : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await getNodalReturnSendingFdms(call.request.token)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
+
+    transferNodalSendingReturned : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await transferNodalSendingReturnedFdm(call.request)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
 
 
     // CreateAwb : async(req:Request , res:Response) => {
