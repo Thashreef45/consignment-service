@@ -8,13 +8,14 @@ config()
 const transferNodalSendingFdm = async (data: { id: string, token: string }) => {
     const nodalId = String(decodeToken(data.token))
     const consignmentDetails = await repository.getByObjectId(data.id)
+
     if (consignmentDetails) {
         if (consignmentDetails.isSameNodal) {
             executeSameNodal(consignmentDetails)
         } else {
             executeApex(consignmentDetails)
         }
-
+        
         removeFdmFromNodal(nodalId, consignmentDetails)
     } else {
         return { status: 404, message: 'Consignment not found' }
@@ -38,12 +39,10 @@ const removeFdmFromNodal = (id: string, data: any) => {
 
 // same nodal -- transfer to cp
 const executeSameNodal = async (data: any) => {
-
     let cpData: any = await getCpDetails({ pin: data.destinationPin });
     cpData = JSON.parse(cpData)
-
+    
     await repository.NodaltoCpSendPart(data._id, cpData.address, cpData.id, cpData.name)
-
     publisher.trasferFdmToCP({ id: cpData.id, awb: `${data.awbPrefix}${data.awb}` })
 }
 
@@ -51,7 +50,6 @@ const executeSameNodal = async (data: any) => {
 const executeApex = async (data: any) => {
     let cpData:any = await getCpDetails({ pin: data.originPin })
     cpData = JSON.parse(cpData)
-    console.log(cpData)
     
     let apexData: any = await getApexDetails({ prefix: cpData.prefix })
     apexData = JSON.parse(apexData)

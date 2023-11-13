@@ -2,7 +2,7 @@ import * as grpc from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
 import controller from '../controller/controller'
 
-const packageDef = protoLoader.loadSync("./src/interfaces/grpc-config/consignment.proto",{})
+const packageDef = protoLoader.loadSync("./src/interfaces/grpc-config/consignment.proto")
 const grpcObject = grpc.loadPackageDefinition(packageDef)
 const consignmentPackage: any = grpcObject.consignmentPackage;
 
@@ -43,6 +43,15 @@ server.addService(consignmentPackage.consignmentService.service,{
     "updateDeliveryStatus":controller.updateDeliveryStatus,
     "getReturnNodalSendingFdms":controller.getNodalSendingReturnFdms,
     "transferReturnNodalSendingFdms":controller.transferNodalSendingReturned,
+    "getReturnApexSendingFdms":controller.getApexSendingReturnFdms,
+    "transferReturnApexSendingFdm":controller.transferApexSendingReturned,
+    "getReturnNodalRecievingFdms":controller.getNodalRecievedReturnFdms,
+    "transferReturnNodalRecievedFdm":controller.transferNodalReturnRecievedFdm,
+    "getReturnApexRecievedFdms":controller.getApexRecievedReturnFdms,
+    "transferReturnApexRecievedFdm":controller.transferApexReturnRecieved,
+
+
 })
+
 
 export default grpcServer

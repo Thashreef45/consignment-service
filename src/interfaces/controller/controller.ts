@@ -15,7 +15,7 @@ import getNodalSendFdms from "../../application/usecase/nodal-send-fdms"
 import transferNodalSendingFdm from "../../application/usecase/transfer-nodal-sending-fdm"
 import getCpRecievedFdms from "../../application/usecase/get-cp-recieved-fdms"
 import getApexSendingFdms from "../../application/usecase/get-apex-sending-fdms"
-import transferApexSendingFdm from "../../application/usecase/transfer-apex-sendign-fdms"
+import transferApexSendingFdm from "../../application/usecase/transfer-apex-sending-fdms"
 import NodalRecievedFdms from "../../application/usecase/get-nodal-recieved-fdms"
 import sendFdmFromNodalRecieved from "../../application/usecase/transfer-from-nodal-recieved"
 import getApexRecievedFdms from "../../application/usecase/get-apex-recieved-fdms"
@@ -26,6 +26,12 @@ import getDeliveryStatus from "../../application/usecase/get-delivery-status"
 import updateDeliveryStatus from "../../application/usecase/update-delivery-status"
 import getNodalReturnSendingFdms from "../../application/usecase/nodal-return-sending-fdms"
 import transferNodalSendingReturnedFdm from "../../application/usecase/transfer-returned-nodal-sending-fdm"
+import getApexSendingReturnedFdms from "../../application/usecase/get-returned-apex-sending-fdms"
+import transferApexSendingReturnFDM from "../../application/usecase/transfer-returned-apex-sending"
+import getNodalReturnRecievedFdms from "../../application/usecase/get-nodal-return-recieved-fdms"
+import transferNodalReturnRecievedFdm from "../../application/usecase/transfer-nodal-return-recieved-fdm"
+import getReturnedApexRecievedFdms from "../../application/usecase/get-returned-apex-recieved-fdms"
+import transferApexReturnRecievedFdms from "../../application/usecase/transfer-apex-return-recieved"
 
 
 export default {
@@ -242,6 +248,64 @@ export default {
             callback(null, { status: 500, message: 'Internal Server Error' })
         }
     },
+
+    getApexSendingReturnFdms : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await getApexSendingReturnedFdms(call.request.token)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
+
+
+    transferApexSendingReturned : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await transferApexSendingReturnFDM(call.request)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
+
+    getNodalRecievedReturnFdms : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await getNodalReturnRecievedFdms(call.request.token)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
+
+    transferNodalReturnRecievedFdm : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await transferNodalReturnRecievedFdm(call.request)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
+
+    getApexRecievedReturnFdms : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await getReturnedApexRecievedFdms(call.request.token)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
+
+    transferApexReturnRecieved : async (call: any, callback: GrpcCallBack) => {
+        try {
+            const response = await transferApexReturnRecievedFdms(call.request)
+            callback(null, response)
+        } catch (error) {
+            callback(null, { status: 500, message: 'Internal Server Error' })
+        }
+    },
+
+
+
 
 
     // CreateAwb : async(req:Request , res:Response) => {
