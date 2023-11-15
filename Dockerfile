@@ -1,15 +1,12 @@
-FROM node:slim
+FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY . .
 
 RUN npm install
 
-COPY . /app
 
-
-# Build the TypeScript code
 RUN npm run build
 
 

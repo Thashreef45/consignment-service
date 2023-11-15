@@ -41,8 +41,8 @@ const removeFdmFromNodal = (id: string, data: any) => {
 const executeSameNodal = async (data: any) => {
     let cpData: any = await getCpDetails({ pin: data.destinationPin });
     cpData = JSON.parse(cpData)
-    
-    await repository.NodaltoCpSendPart(data._id, cpData.address, cpData.id, cpData.name)
+    const statusId = String(await getStatusId())
+    await repository.NodaltoCpSendPart(data._id, cpData.address, cpData.id, cpData.name,statusId)
     publisher.trasferFdmToCP({ id: cpData.id, awb: `${data.awbPrefix}${data.awb}` })
 }
 
@@ -139,6 +139,19 @@ const getApexDetails = (data: { prefix: string }) => {
         }
     });
 };
+
+//status id of out for delivery
+const getStatusId = async () => {
+    const data = await repository.getAllDeliveryStatus()
+    let index = 0
+    
+    return data.map((status,i)=>{
+        if(status.statusName == 'Out for delivery') {
+            index = i
+            return String(status._id)
+        }
+    })[index]
+}
 
 
 

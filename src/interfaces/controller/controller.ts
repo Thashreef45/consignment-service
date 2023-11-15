@@ -52,7 +52,7 @@ export default {
         }
     },
 
-    newBooking: async (call: NewBooking, callback: GrpcCallBack) => {
+    newBooking : async (call: NewBooking, callback: GrpcCallBack) => {
         try {
             const reponse = await newConsignment(call.request)
             callback(null, reponse)

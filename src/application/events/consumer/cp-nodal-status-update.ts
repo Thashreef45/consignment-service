@@ -36,7 +36,22 @@ const execute = async (data: any) => {
 
 
 const UpdateConsignments = async (id:string,prefix: string, awb: number,address:string,name:string) => {
-    await repository.BookingsReachedAtNodal(id,prefix, awb,address,name)
+    const statusId = String(await setStatus())
+    await repository.BookingsReachedAtNodal(id,prefix, awb,address,name,statusId)
+}
+
+
+
+const setStatus = async () => {
+    const data = await repository.getAllDeliveryStatus()
+    let index = 0
+    
+    return data.map((status,i)=>{
+        if(status.statusName == 'Intransist') {
+            index = i
+            return String(status._id)
+        }
+    })[index]
 }
 
 
