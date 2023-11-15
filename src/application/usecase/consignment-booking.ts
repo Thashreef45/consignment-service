@@ -1,6 +1,7 @@
 import { verify } from "jsonwebtoken"
 import repository from "../../infrastructure/repositories/repository"
 import publisher from "../events/publisher/publisher"
+import decodeToken from "../../utils/decode-token"
 
 const newConsignment = async (data: any) => {
     try {
@@ -8,7 +9,11 @@ const newConsignment = async (data: any) => {
         data.awbPrefix = data.awb.slice(0, 2)
         data.awb = Number(data.awb.slice(2, 10))
         data.mobile = Number(data.mobile)
-        data.id = tokenExtract(data.token)
+        data.id = decodeToken(data.token)
+        const statusId = await getBookedStatusId()
+        data.statusId = statusId
+
+
         const updated = await repository.newBooking(data)
         if (updated) {
             publisher.removeBookedAwb({
@@ -33,12 +38,15 @@ const newConsignment = async (data: any) => {
 
 export default newConsignment
 
-
-const tokenExtract = (token:string) => {
-    const jwtSignature = String(process.env.JWT_SIGNATURE)
-    token = token.split(" ")[1]
-    const data = verify(token,jwtSignature)
-    if(typeof data == 'object'){
-        return data.id
-    }
+const getBookedStatusId = async () => {
+    const data = await repository.getAllDeliveryStatus()
+    let index = 0
+    
+    return data.map((status,i)=>{
+        if(status.statusName == 'Booked') {
+            index = i
+            return String(status._id)
+        }
+    })[index]
 }
+

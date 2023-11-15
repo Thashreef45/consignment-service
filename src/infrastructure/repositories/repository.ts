@@ -25,7 +25,7 @@ export default {
             declaredValue: data.declaredValue,
             isSameNodal: data.isSameNodal,
             isSameApex: data.isSameApex,
-            status: '65242b1ae176246b91a399c3'
+            status: data.statusId,
         })
         return await cretedData.save()
     },
@@ -137,7 +137,7 @@ export default {
         ])
     },
 
-    BookingsReachedAtNodal: async (id: string, prefix: string, awb: number, address: string, name: string) => {
+    BookingsReachedAtNodal: async (id: string, prefix: string, awb: number, address: string, name: string,statusId:string) => {
         const data = await Model.updateOne(
             { awbPrefix: prefix, awb: awb },
             {
@@ -147,7 +147,7 @@ export default {
                     "sending.nodalRecieved.name": name,
                     "sending.nodalRecieved.Date": Date.now(),
                     "sending.nodalRecieved.id": id,
-                    status: '65154b2c674c55fd5fd6b491'
+                    status: statusId
                 },
             })
     },
@@ -229,7 +229,7 @@ export default {
         )
     },
 
-    NodaltoCpSendPart: async (id: string, address: string, cpId: string, name: string) => {
+    NodaltoCpSendPart: async (id: string, address: string, cpId: string, name: string,statusId:string) => {
         return await Model.updateOne(
             { _id: id },
             {
@@ -239,7 +239,7 @@ export default {
                     'recieving.cpRecieved.id': cpId,
                     'recieving.cpRecieved.name': name,
                     'recieving.cpRecieved.address': address,
-                    status: '652a236562de0abb642c03a8'
+                    status: statusId
                 }
             }
         )
@@ -497,6 +497,10 @@ export default {
                 $set: { status: "$status.statusName" }
             }
         ])
+    },
+
+    getAllDeliveryStatus: async () => {
+        return await statusModel.find()
     },
 
 
