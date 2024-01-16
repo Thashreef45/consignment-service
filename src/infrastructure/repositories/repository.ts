@@ -1,5 +1,5 @@
 import connectDB from "../../utils/db-connection"
-import awbModel from "../../domain/entities/awb"
+import awbModel, { AwbDocument } from "../../domain/entities/awb"
 import Model from "../../domain/entities/consignment-model"
 import storeOrderModel from "../../domain/entities/store-orders"
 import { buyAwb, CreateAwb } from "../interfaces/interface"
@@ -35,11 +35,11 @@ export default {
         return await awbModel.updateOne({ prefix: key }, { $inc: { awbAvailability: value } })
     },
 
-    isExist: async (data: any) => {
+    isExist: async (data: any): Promise<AwbDocument[]> => {
         return await awbModel.find(data)
     },
 
-    lastUpdatedAwb: async (data: string) => {
+    lastUpdatedAwb: async (data: string): Promise<AwbDocument | null> => {
         return await awbModel.findOne({ prefix: data })
     },
 
@@ -137,7 +137,7 @@ export default {
         ])
     },
 
-    BookingsReachedAtNodal: async (id: string, prefix: string, awb: number, address: string, name: string,statusId:string) => {
+    BookingsReachedAtNodal: async (id: string, prefix: string, awb: number, address: string, name: string, statusId: string) => {
         const data = await Model.updateOne(
             { awbPrefix: prefix, awb: awb },
             {
@@ -153,7 +153,7 @@ export default {
     },
 
     //check its a valid prefix 
-    isValidPrefix: async (prefix: string) => {
+    isValidPrefix: async (prefix: string): Promise<AwbDocument | null> => {
         return await awbModel.findOne({ prefix: prefix })
     },
 
@@ -229,7 +229,7 @@ export default {
         )
     },
 
-    NodaltoCpSendPart: async (id: string, address: string, cpId: string, name: string,statusId:string) => {
+    NodaltoCpSendPart: async (id: string, address: string, cpId: string, name: string, statusId: string) => {
         return await Model.updateOne(
             { _id: id },
             {
@@ -264,18 +264,20 @@ export default {
         console.log(id)
         return await Model.aggregate([
             {
-                $match: {$or:[
-                    {
-                        'recieving.cpRecieved.id': id,
-                        deliveryAssignedTo: { $exists: false },
-                        'recieving.cpUpdate': { $exists: false },
-                    },
-                    {
-                        'deliveryAssignedTo.return': { $exists: false },
-                        'notDelivered.recieving.cpRecieved.id' : id,
-                        'notDelivered.recieving.cpUpdate' : { $exists: false }
-                    }
-                ]}
+                $match: {
+                    $or: [
+                        {
+                            'recieving.cpRecieved.id': id,
+                            deliveryAssignedTo: { $exists: false },
+                            'recieving.cpUpdate': { $exists: false },
+                        },
+                        {
+                            'deliveryAssignedTo.return': { $exists: false },
+                            'notDelivered.recieving.cpRecieved.id': id,
+                            'notDelivered.recieving.cpUpdate': { $exists: false }
+                        }
+                    ]
+                }
             },
             {
                 $lookup: { from: 'content-types', localField: 'contentType', foreignField: '_id', as: 'type' }
@@ -472,8 +474,8 @@ export default {
                 $match: {
                     $or:
                         [
-                            { 'deliveryAssignedTo.delivery': id ,'recieving.cpUpdate': { $exists: false }},
-                            { 'deliveryAssignedTo.return': id ,'notDelivered.recieving.cpUpdate': { $exists: false }}
+                            { 'deliveryAssignedTo.delivery': id, 'recieving.cpUpdate': { $exists: false } },
+                            { 'deliveryAssignedTo.return': id, 'notDelivered.recieving.cpUpdate': { $exists: false } }
                         ],
                 }
 
@@ -519,7 +521,7 @@ export default {
     },
 
 
-    updateDelivered : async (id: string, status: string, image: string) => {
+    updateDelivered: async (id: string, status: string, image: string) => {
         return await Model.updateOne(
             { _id: id },
             {
@@ -532,7 +534,7 @@ export default {
         )
     },
 
-    updateRTPDelivery : async (id: string, image: string) => {
+    updateRTPDelivery: async (id: string, image: string) => {
         return await Model.updateOne(
             { _id: id },
             {
@@ -544,7 +546,7 @@ export default {
         )
     },
 
-    updateReturnFromCpToNodal : async (id: string, status: string, image: string,address:string,name:string,nodalId:string) => {
+    updateReturnFromCpToNodal: async (id: string, status: string, image: string, address: string, name: string, nodalId: string) => {
         return await Model.updateOne(
             { _id: id },
             {
@@ -556,18 +558,18 @@ export default {
                     'notDelivered.sending.nodalRecieved.id': nodalId,
                     status: status,
                     drs: image,
-                    isReturned:true
+                    isReturned: true
                 }
             }
         )
     },
 
 
-    getNodalReturnedSendingFdms : async(id:string) => {
+    getNodalReturnedSendingFdms: async (id: string) => {
         return await Model.aggregate([
             {
-                $match:{
-                    'notDelivered.sending.nodalRecieved.id':id,
+                $match: {
+                    'notDelivered.sending.nodalRecieved.id': id,
                     'notDelivered.sending.nodalSend': { $exists: false }
                 }
             },
@@ -592,7 +594,7 @@ export default {
         ])
     },
 
-    transferReturnFromNodalSendignToCpRecieving : async (id: string,address:string,name:string,cpId:string) => {
+    transferReturnFromNodalSendignToCpRecieving: async (id: string, address: string, name: string, cpId: string) => {
         return await Model.updateOne(
             { _id: id },
             {
@@ -609,11 +611,11 @@ export default {
 
 
     //working on it
-    getApexReturnedSendingFdms : async(id:string) => {
+    getApexReturnedSendingFdms: async (id: string) => {
         return await Model.aggregate([
             {
-                $match:{
-                    'notDelivered.sending.apexRecieved.id':id,
+                $match: {
+                    'notDelivered.sending.apexRecieved.id': id,
                     'notDelivered.sending.apexSend': { $exists: false }
                 }
             },
@@ -638,35 +640,35 @@ export default {
         ])
     },
 
-    
 
 
-    transferReturnFromNodalSendingToApexSending : async (id:string,name:String , address:String,apexId:String) => {
+
+    transferReturnFromNodalSendingToApexSending: async (id: string, name: String, address: String, apexId: String) => {
         return await Model.updateOne(
-            {_id:id},
+            { _id: id },
             {
-                $set : {
+                $set: {
                     'notDelivered.sending.nodalSend': Date.now(),
-                    'notDelivered.sending.apexRecieved.Date' : Date.now(),
-                    'notDelivered.sending.apexRecieved.id':apexId,
-                    'notDelivered.sending.apexRecieved.name' : name,
-                    'notDelivered.sending.apexRecieved.address' : address,
+                    'notDelivered.sending.apexRecieved.Date': Date.now(),
+                    'notDelivered.sending.apexRecieved.id': apexId,
+                    'notDelivered.sending.apexRecieved.name': name,
+                    'notDelivered.sending.apexRecieved.address': address,
                 }
             }
         )
     },
 
 
-    transferReturnFromApexSendingToNodalRecieving : async (id:string,name:String , address:String,nodalId:String) => {
+    transferReturnFromApexSendingToNodalRecieving: async (id: string, name: String, address: String, nodalId: String) => {
         return await Model.updateOne(
-            {_id:id},
+            { _id: id },
             {
-                $set : {
+                $set: {
                     'notDelivered.sending.apexSend': Date.now(),
-                    'notDelivered.recieving.nodalRecieved.Date' : Date.now(),
-                    'notDelivered.recieving.nodalRecieved.id':nodalId,
-                    'notDelivered.recieving.nodalRecieved.name' : name,
-                    'notDelivered.recieving.nodalRecieved.address' : address,
+                    'notDelivered.recieving.nodalRecieved.Date': Date.now(),
+                    'notDelivered.recieving.nodalRecieved.id': nodalId,
+                    'notDelivered.recieving.nodalRecieved.name': name,
+                    'notDelivered.recieving.nodalRecieved.address': address,
                 }
             }
         )
@@ -674,27 +676,27 @@ export default {
 
 
     //pending here
-    transferReturnFromApexSendingToApexRecieving : async (id:string,name:String , address:String,apexId:String) => {
+    transferReturnFromApexSendingToApexRecieving: async (id: string, name: String, address: String, apexId: String) => {
         return await Model.updateOne(
-            {_id:id},
+            { _id: id },
             {
-                $set : {
+                $set: {
                     'notDelivered.sending.apexSend': Date.now(),
-                    'notDelivered.recieving.apexRecieved.Date' : Date.now(),
-                    'notDelivered.recieving.apexRecieved.id':apexId,
-                    'notDelivered.recieving.apexRecieved.name' : name,
-                    'notDelivered.recieving.apexRecieved.address' : address,
+                    'notDelivered.recieving.apexRecieved.Date': Date.now(),
+                    'notDelivered.recieving.apexRecieved.id': apexId,
+                    'notDelivered.recieving.apexRecieved.name': name,
+                    'notDelivered.recieving.apexRecieved.address': address,
                 }
             }
         )
     },
 
 
-    getNodalReturnedRecievedFdms : async(id:string) => {
+    getNodalReturnedRecievedFdms: async (id: string) => {
         return await Model.aggregate([
             {
-                $match:{
-                    'notDelivered.recieving.nodalRecieved.id':id,
+                $match: {
+                    'notDelivered.recieving.nodalRecieved.id': id,
                     'notDelivered.recieving.nodalSend': { $exists: false }
                 }
             },
@@ -719,7 +721,7 @@ export default {
         ])
     },
 
-    transferReturnFromNodalRecievedToCpRecieving : async (id: string,address:string,name:string,cpId:string) => {
+    transferReturnFromNodalRecievedToCpRecieving: async (id: string, address: string, name: string, cpId: string) => {
         return await Model.updateOne(
             { _id: id },
             {
@@ -735,11 +737,11 @@ export default {
     },
 
 
-    getApexReturnedRecievedFdms : async(id:string) => {
+    getApexReturnedRecievedFdms: async (id: string) => {
         return await Model.aggregate([
             {
-                $match:{
-                    'notDelivered.recieving.apexRecieved.id':id,
+                $match: {
+                    'notDelivered.recieving.apexRecieved.id': id,
                     'notDelivered.recieving.apexSend': { $exists: false }
                 }
             },
@@ -764,7 +766,7 @@ export default {
         ])
     },
 
-    transferReturnApexRecievingToNodalRecieving : async (id: string,address:string,name:string,nodalId:string) => {
+    transferReturnApexRecievingToNodalRecieving: async (id: string, address: string, name: string, nodalId: string) => {
         return await Model.updateOne(
             { _id: id },
             {

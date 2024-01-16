@@ -2,7 +2,7 @@ import * as grpc from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
 import controller from '../controller/controller'
 
-const packageDef = protoLoader.loadSync("/home/thashreef/Brototype/express-link/server/microservices/consignment-service/src/interfaces/grpc-config/consignment.proto")
+const packageDef = protoLoader.loadSync("./src/interfaces/grpc-config/consignment.proto")
 const grpcObject = grpc.loadPackageDefinition(packageDef)
 const consignmentPackage: any = grpcObject.consignmentPackage;
 
